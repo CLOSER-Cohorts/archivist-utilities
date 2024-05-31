@@ -2,6 +2,14 @@
     <body>
 
         <script>
+
+const inputElement = document.getElementById("input");
+inputElement.addEventListener("change", handleFiles, false);
+function handleFiles() {
+  const fileList = this.files; /* now you can work with the file list */
+  console.log("HEY two")
+  console.log(fileList)
+}
             function generateFiles() {
 
               console.log("HEY THERE")
@@ -9,7 +17,7 @@
             }
             </script>
         <div style="font-size:20px; padding:5px"><h1>Generate text mappings files</h1>
-            <input id="input" type="file" onclick="generateFiles()"/>
+            <input id="input" type="file"/>
             <div style="padding:5px"></div>
             <div style="padding:5px"></div>
             <div style="padding:5px"></div>
