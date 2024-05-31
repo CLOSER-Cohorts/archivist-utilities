@@ -1,6 +1,5 @@
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
-import '../styles/global.css';
 
 
 // Retrieve the external workbook file and set up a `FileReader` object. 
@@ -16,7 +15,7 @@ reader.onload = (function (event) {
         return context.sync();
     });
 });
-*/
+
 
 // Read the file as a data URL so we can parse the base64-encoded string.
 //reader.readAsDataURL(myFile.files[0]);
@@ -151,3 +150,4 @@ export default function Home() {
     </div>
   );
 }
+*/
