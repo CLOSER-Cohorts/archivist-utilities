@@ -16,7 +16,7 @@ export default function About() {
     var formBlob2 = new Blob(["TESTING"], { type: 'text/plain' });
     console.log(formBlob2)
     const path = (window.URL.createObjectURL(formBlob2))
-    // setLinkHref(path)
+    //setLinkHref(path)
     //setLinkHref("://localhost:3000/favicon.ico")
   }, [])
 
