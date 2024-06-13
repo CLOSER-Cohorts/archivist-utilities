@@ -1,0 +1,93 @@
+<html>
+    <bvody>
+        <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+        <div style="font-size:20px; padding:5px"><h1>DDI Profile Validator</h1>
+            <input id="input" type="file"/>
+            <div style="padding:5px" id="qv"></div>
+            <div style="padding:5px" id="tv"></div>
+            <div style="padding:5px" id="tq"></div>
+            <div style="padding:5px" id="dv"></div>
+            </div>
+            <div id="validatorOutput"></div>
+
+            <script>
+
+async function executePostRequestWithoutToken(url, requestBody) {
+
+const options = {
+  method: 'POST',
+  body: JSON.stringify(requestBody),
+  headers: { 'Content-Type': 'application/json' }
+
+}
+
+try {
+  const res = await fetch(url, options);
+  return await res;
+} catch (error) {
+  console.log(`Error: API call to ${url} failed! ${error.message}, ${error.cause}, ${error.cause.code}`)
+}
+
+}
+  
+            function createBlobURL(columns) {
+
+                var file2 = ""
+            for (let i = 0; i < columns[0].length; i++) {
+            
+                const fileEntry = columns.map(column => column[i])
+
+                console.log(fileEntry)
+        
+            if (!(fileEntry.includes("NA") || fileEntry.includes("Derived")))
+                file2 = file2 +fileEntry.join("\t") +"\n"
+
+      }
+
+      var formBlob = new Blob([file2], { type: 'text/plain' });
+
+      const link2 = window.URL.createObjectURL(formBlob);
+
+      return link2
+
+            }
+
+            const inputElement = document.getElementById("input");
+                inputElement.addEventListener("change", handleFiles, false);
+                
+                function handleFiles() {
+                    const fileList = this.files;
+                    console.log("UPLOADED")
+                    console.log(fileList[0])
+                    const reader = new FileReader()
+                    reader.readAsArrayBuffer(fileList[0])
+                    reader.onload = (function (event) {
+                        parsedJson = (JSON.parse(new TextDecoder().decode(reader.result)));
+                        console.log(parsedJson)
+                        var jsonBody = parsedJson
+                    executePostRequestWithoutToken("https://cmv.cessda.eu/api/V0/Validation",                    
+                    jsonBody
+                ).then(data => {
+                    return data.json()
+}
+).then(data2  => 
+        {
+        var output = "<div>"    
+        output = output + data2.ConstraintViolation.map(x => "<div>" + x.message + "</div>").join("")
+        output = output + "</div>"
+        document.getElementById("validatorOutput").innerHTML = output
+        }
+        
+    )
+
+                    })
+                    
+
+                }
+                    
+                            
+                            </script>
+                
+
+    </body>
+</html> 

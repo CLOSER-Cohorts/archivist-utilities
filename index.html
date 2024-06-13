@@ -1,15 +1,63 @@
 <html>
     <body>
-
+        <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
         <div style="font-size:20px; padding:5px"><h1>Generate text mappings files</h1>
             <input id="input" type="file"/>
-            <div style="padding:5px"></div>
-            <div style="padding:5px"></div>
-            <div style="padding:5px"></div>
-            <div style="padding:5px"></div>
+            <div style="padding:5px" id="qv"></div>
+            <div style="padding:5px" id="tv"></div>
+            <div style="padding:5px" id="tq"></div>
+            <div style="padding:5px" id="dv"></div>
             </div>
 
             <script>
+
+            function createColumn(indexOffset,dataCellField,suffix = "") {
+              var questionLabels=[]
+      const indexes2 = [...Array(numberOfVariables).keys().map(x => (x*8)+4)]
+      
+      indexes2.forEach(x => {
+          const qvTxtColumn2 = worksheetCells[dataCells[x]]['h']  
+          questionLabels.push(qvTxtColumn2)
+        }
+      )
+
+            }  
+
+            function addLinkToPage(linkURL, linkText, downloadedFilename, pageDivId) {
+
+                const link = document.createElement("a");
+
+                link.href=linkURL
+
+                link.text=linkText
+
+                link.download=downloadedFilename
+
+                document.getElementById(pageDivId).appendChild(link)
+
+            }    
+
+            function createBlobURL(columns) {
+
+                var file2 = ""
+            for (let i = 0; i < columns[0].length; i++) {
+            
+                const fileEntry = columns.map(column => column[i])
+
+                console.log(fileEntry)
+        
+            if (!(fileEntry.includes("NA") || fileEntry.includes("Derived")))
+                file2 = file2 +fileEntry.join("\t") +"\n"
+
+      }
+
+      var formBlob = new Blob([file2], { type: 'text/plain' });
+
+      const link2 = window.URL.createObjectURL(formBlob);
+
+      return link2
+
+            }
 
                 const inputElement = document.getElementById("input");
                 inputElement.addEventListener("change", handleFiles, false);
@@ -17,6 +65,146 @@
                   const fileList = this.files; /* now you can work with the file list */
                   console.log("HEY two")
                   console.log(fileList)
+                  const reader = new FileReader()
+
+                  reader.onload = (function (event) {
+                  const wb = XLSX.read(reader.result);
+      
+                    const cellNames = Object.keys(wb['Sheets']['QV and TV Mappings'])
+      const worksheetCells = wb['Sheets']['QV and TV Mappings']
+      console.log(worksheetCells)
+      const dataCells=cellNames.slice(9,cellNames.length-1)
+      const numberOfVariables = (dataCells.length)/8
+      console.log(dataCells)
+
+      const cellNames2 = Object.keys(wb['Sheets']['DV'])
+      const worksheetCells2 = wb['Sheets']['DV']
+      console.log(worksheetCells2)
+      const dataCells2=cellNames2.slice(7,cellNames2.length-2)
+      const numberOfVariables2 = (dataCells2.length)/6
+      console.log(dataCells2)
+
+      // I NEED TO WRITE CODE THAT GENERALISES THE OPERATIONS BELOW
+
+      var questionnairePrefix=[]
+      const indexes = [...Array(numberOfVariables).keys().map(x => (x*8)+3)]
+      indexes.forEach(x => {  
+        const qvTxtColumn1 = worksheetCells[dataCells[x]]['v']+"_ccs01"
+            questionnairePrefix.push(qvTxtColumn1)
+      }
+      )
+
+      var questionLabels=[]
+      const indexes2 = [...Array(numberOfVariables).keys().map(x => (x*8)+4)]
+      
+      indexes2.forEach(x => {
+          const qvTxtColumn2 = worksheetCells[dataCells[x]]['h']  
+          questionLabels.push(qvTxtColumn2)
+        }
+      )
+
+      var datasetPrefixes=[]
+      const indexes3 = [...Array(numberOfVariables).keys().map(x => (x*8))]
+      indexes3.forEach(x => {
+          const qvTxtColumn3 = worksheetCells[dataCells[x]]['v']
+          datasetPrefixes.push(qvTxtColumn3)
+        }
+      )
+
+      var variableNames=[]
+      const indexes4 = [...Array(numberOfVariables).keys().map(x => (x*8)+1)]
+      
+      indexes4.forEach(x => {
+          const qvTxtColumn4 = worksheetCells[dataCells[x]]['v']
+          variableNames.push(qvTxtColumn4)
+        }
+      )
+
+      var topicIds=[]
+      const indexes5 = [...Array(numberOfVariables).keys().map(x => (x*8)+6)]
+      
+      indexes5.forEach(x => {
+        
+          const qvTxtColumn5 = worksheetCells[dataCells[x]]['v']
+          topicIds.push(qvTxtColumn5)
+       
+      }
+      )
+
+      var derivedVariableNames=[]
+      const indexes6 = [...Array(numberOfVariables2).keys().map(x => (x*6)+1)]
+      
+      indexes6.forEach(x => {
+        
+          const qvTxtColumn6 = worksheetCells2[dataCells2[x]]['v']
+          derivedVariableNames.push(qvTxtColumn6)
+        
+        }
+      )
+
+      var sourceVariableNames=[]
+      const indexes7 = [...Array(numberOfVariables2).keys().map(x => (x*6)+4)]
+      
+      indexes7.forEach(x => {  
+      
+          const qvTxtColumn7 = worksheetCells2[dataCells2[x]]['v']
+          sourceVariableNames.push(qvTxtColumn7)
+        
+      }
+      )
+
+      var variableDatasetPrefixes=[]
+      const indexes8 = [...Array(numberOfVariables2).keys().map(x => (x*6))]
+      
+      indexes8.forEach(x => {  
+      
+        const qvTxtColumn8 = worksheetCells2[dataCells2[x]]['v']
+          variableDatasetPrefixes.push(qvTxtColumn8)
+        
+      }
+      )
+
+      console.log(questionnairePrefix.length)
+      console.log(questionLabels.length)
+      console.log(datasetPrefixes.length)
+      console.log(variableNames.length)
+      console.log(topicIds.length)
+      console.log(derivedVariableNames.length)
+      console.log(sourceVariableNames.length)
+      console.log(variableDatasetPrefixes.length)
+
+      var qvLinkURL=createBlobURL([questionnairePrefix, 
+        questionLabels, 
+        datasetPrefixes,
+        variableNames])
+
+      addLinkToPage(qvLinkURL, "qv.txt", "qv.txt", "qv")
+      
+      var tvLinkURL=createBlobURL([datasetPrefixes, 
+        variableNames, 
+        topicIds])
+
+      addLinkToPage(tvLinkURL, "tv.txt", "tv.txt", "tv")  
+
+      var tqLinkURL=createBlobURL([questionnairePrefix, 
+      questionLabels, 
+      topicIds])
+
+      addLinkToPage(tqLinkURL, "tq.txt", "tq.txt", "tq")
+
+      var dvLinkURL=createBlobURL([variableDatasetPrefixes, 
+    derivedVariableNames, 
+    variableDatasetPrefixes,
+    sourceVariableNames
+  ])
+
+      addLinkToPage(dvLinkURL, "dv.txt", "dv.txt", "dv")
+
+        })
+      
+                  reader.readAsArrayBuffer(fileList[0])
+
+
                 }
                             function generateFiles() {
                 
@@ -27,4 +215,4 @@
                 
 
     </body>
-</html>
+</html> 
