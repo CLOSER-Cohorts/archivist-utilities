@@ -76,14 +76,14 @@
       const dataCells=cellNames.slice(9,cellNames.length-1)
       const numberOfVariables = (dataCells.length)/8
       console.log(dataCells)
-
+/*
       const cellNames2 = Object.keys(wb['Sheets']['DV'])
       const worksheetCells2 = wb['Sheets']['DV']
       console.log(worksheetCells2)
       const dataCells2=cellNames2.slice(7,cellNames2.length-2)
       const numberOfVariables2 = (dataCells2.length)/6
       console.log(dataCells2)
-
+*/
       // I NEED TO WRITE CODE THAT GENERALISES THE OPERATIONS BELOW
 
       var questionnairePrefix=[]
@@ -131,6 +131,8 @@
       }
       )
 
+
+      /*
       var derivedVariableNames=[]
       const indexes6 = [...Array(numberOfVariables2).keys().map(x => (x*6)+1)]
       
@@ -163,7 +165,7 @@
         
       }
       )
-
+*/
       console.log(questionnairePrefix.length)
       console.log(questionLabels.length)
       console.log(datasetPrefixes.length)
