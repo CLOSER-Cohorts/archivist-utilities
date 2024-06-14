@@ -46,7 +46,7 @@
 
                 console.log(fileEntry)
         
-            if (!(fileEntry.includes("NA") || fileEntry.includes("Derived")))
+            if (!(fileEntry.includes("NA") || fileEntry.includes("Derived") || fileEntry == ""))
                 file2 = file2 +fileEntry.join("\t") +"\n"
 
       }
@@ -68,14 +68,21 @@
                   const reader = new FileReader()
 
                   reader.onload = (function (event) {
-                  const wb = XLSX.read(reader.result);
+
+                    
+                  const wb = XLSX.read(reader.result, {nullError:true});
       
                     const cellNames = Object.keys(wb['Sheets']['QV and TV Mappings'])
       const worksheetCells = wb['Sheets']['QV and TV Mappings']
       console.log(worksheetCells)
+      const data = XLSX.utils.sheet_to_json((worksheetCells),{defval:""});
+      console.log(data)
+      console.log(wb['Sheets'])
+      console.log(worksheetCells['!ref'].split(":"))
       const dataCells=cellNames.slice(9,cellNames.length-1)
       const numberOfVariables = (dataCells.length)/8
       console.log(dataCells)
+      console.log(dataCells.length)
 /*
       const cellNames2 = Object.keys(wb['Sheets']['DV'])
       const worksheetCells2 = wb['Sheets']['DV']
@@ -87,8 +94,10 @@
       // I NEED TO WRITE CODE THAT GENERALISES THE OPERATIONS BELOW
 
       var questionnairePrefix=[]
+      console.log(worksheetCells)
       const indexes = [...Array(numberOfVariables).keys().map(x => (x*8)+3)]
-      indexes.forEach(x => {  
+      indexes.forEach(x => {
+        console.log(worksheetCells[dataCells[x]]['v'])  
         const qvTxtColumn1 = worksheetCells[dataCells[x]]['v']+"_ccs01"
             questionnairePrefix.push(qvTxtColumn1)
       }
@@ -175,6 +184,7 @@
       console.log(sourceVariableNames.length)
       console.log(variableDatasetPrefixes.length)
 
+      console.log(datasetPrefixes)
       var qvLinkURL=createBlobURL([questionnairePrefix, 
         questionLabels, 
         datasetPrefixes,
