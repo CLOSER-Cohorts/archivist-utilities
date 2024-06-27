@@ -33,6 +33,8 @@
 
                 link.download=downloadedFilename
 
+                document.getElementById(pageDivId).innerHTML=""
+
                 document.getElementById(pageDivId).appendChild(link)
 
             }    
@@ -43,9 +45,13 @@
               
       data.forEach(x => {
         
+        var newObject = {}
        
+        Object.keys(x).forEach(fieldName => newObject[fieldName.toLowerCase()] = x[fieldName]) 
+      
+
         const fileEntry = []
-        columns.map(y => fileEntry.push(x[y] + (!!suffix[y] ? suffix[y] : "")))
+        columns.map(y => fileEntry.push(newObject[y.toLowerCase()] + (!!suffix[y] ? suffix[y] : "")))
         
         if (!(fileEntry.includes("NA") || fileEntry.includes("Derived") || fileEntry.includes("")))
         fileData = fileData + fileEntry.join("\t") +"\n"
@@ -77,13 +83,10 @@
       
       const data = XLSX.utils.sheet_to_json((worksheetCells),{defval:""});
      
-      
 
       var qvLinkURL=createBlobURL(data, ['Questionnaire prefix', 'Question Name', 'Dataset prefix', 'Variable Name'],
         { 'Questionnaire prefix': '_ccs01'}
       )
-
-
 
       addLinkToPage(qvLinkURL, "qv.txt", "qv.txt", "qv")
 
