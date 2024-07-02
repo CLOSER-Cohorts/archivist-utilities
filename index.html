@@ -10,6 +10,7 @@
             <div style="padding:5px" id="tv"></div>
             <div style="padding:5px" id="tq"></div>
             <div style="padding:5px" id="dv"></div>
+            <div id="statusMessage"></div>
             </div>
 
             <script>
@@ -78,7 +79,11 @@
                   submitButton.textContent = "Convert file"
                   const fileList = this.files; /* now you can work with the file list */
                   submitButton.addEventListener("click", () => handleFiles(fileList), false);
-
+                  submitButtonElement.innerHTML=""
+                  document.getElementById("qv").innerHTML=""
+                  document.getElementById("tv").innerHTML=""
+                  document.getElementById("tq").innerHTML=""
+                  document.getElementById("dv").innerHTML=""
                   submitButtonElement.appendChild(submitButton)
                 }
 
@@ -88,9 +93,9 @@
 
                   reader.onload = (function (event) {
 
-                    
+                    try {
                   const wb = XLSX.read(reader.result, {nullError:true});
-      
+                
                     const cellNames = Object.keys(wb['Sheets']['QV and TV Mappings'])
       const worksheetCells = wb['Sheets']['QV and TV Mappings']
       
@@ -124,6 +129,7 @@
   ])
 
       addLinkToPage(dvLinkURL, "dv.txt", "dv.txt", "dv")
+                    } catch(e) {document.getElementById("statusMessage").textContent = "Error parsing uploaded file."}
 
 
      
