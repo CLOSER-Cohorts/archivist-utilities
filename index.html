@@ -153,8 +153,23 @@ function getUniqueArrayValues(arrayData) {
      
       
     //  NEED TO READ IN FROM DV SHEET NOW
-     
+
+    var datasets2=(getUniqueArrayValues(data2.map(x => x['Dataset prefix']).filter(y=>
+      (!!y && !(y.includes("NA") || y.includes("Derived") || !y))
+      )))
+
+    datasets2.forEach( x => {
+        console.log(x)
+        
+        var dvLinkURL=createBlobURL(data2.filter(y => y['Dataset prefix']==x), ["Dataset prefix", 
+    "Derived Variable Name", 
+    "Dataset prefix",
+    "Source Variable Name"
+  ])
+        addLinkToPage(dvLinkURL, `${x}_dv.txt`, `${x}_dv.txt`, `dv${x.replaceAll("_","-")}`)
+      })
     
+      /*
     var dvLinkURL=createBlobURL(data2, ["Dataset prefix", 
     "Derived Variable Name", 
     "Dataset prefix",
@@ -162,6 +177,7 @@ function getUniqueArrayValues(arrayData) {
   ])
 
       addLinkToPage(dvLinkURL, "dv.txt", "dv.txt", "dv")
+      */
                   //  } catch(e) {document.getElementById("statusMessage").textContent = "Error parsing uploaded file. " + e}
 
 
