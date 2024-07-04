@@ -6,14 +6,15 @@
               <div><input id="input" type="file"/></div>
               <div id="submitButton"></div>
             </div>
-            <div style="padding:5px" id="qv"></div>
-            <div style="padding:5px" id="tv"></div>
-            <div style="padding:5px" id="tq"></div>
-            <div style="padding:5px" id="dv"></div>
+            <div style="padding:5px" id="qv2"></div>
             <div id="statusMessage"></div>
             </div>
 
             <script>
+
+function getUniqueArrayValues(arrayData) {
+  return [...new Set(arrayData)]
+}
 
             function createColumn(indexOffset,dataCellField,suffix = "") {
               var questionLabels=[]
@@ -29,7 +30,13 @@
 
             function addLinkToPage(linkURL, linkText, downloadedFilename, pageDivId) {
 
+              console.log(pageDivId)
+
                 const link = document.createElement("a");
+
+                const div = document.createElement("div");
+
+                div.id=pageDivId
 
                 link.href=linkURL
 
@@ -37,7 +44,9 @@
 
                 link.download=downloadedFilename
 
-                document.getElementById(pageDivId).innerHTML=""
+                //document.getElementById("qv2").innerHTML=""
+
+                document.getElementById("qv2").appendChild(div)
 
                 document.getElementById(pageDivId).appendChild(link)
 
@@ -80,10 +89,10 @@
                   const fileList = this.files; /* now you can work with the file list */
                   submitButton.addEventListener("click", () => handleFiles(fileList), false);
                   submitButtonElement.innerHTML=""
-                  document.getElementById("qv").innerHTML=""
-                  document.getElementById("tv").innerHTML=""
-                  document.getElementById("tq").innerHTML=""
-                  document.getElementById("dv").innerHTML=""
+                  document.getElementById("qv2").innerHTML=""
+             //     document.getElementById("tv").innerHTML=""
+             //     document.getElementById("tq").innerHTML=""
+             //     document.getElementById("dv").innerHTML=""
                   document.getElementById("statusMessage").textContent = ""
                   submitButtonElement.appendChild(submitButton)
                 }
@@ -94,14 +103,25 @@
 
                   reader.onload = (function (event) {
 
-                    try {
+          //          try {
                   const wb = XLSX.read(reader.result, {nullError:true});
-                
-                    const cellNames = Object.keys(wb['Sheets']['QV and TV Mappings'])
-      const worksheetCells = wb['Sheets']['QV and TV Mappings']
+                // Get QV and TV Mappings sheet...
+                    const cellNames = Object.keys(wb['Sheets'][Object.keys(wb['Sheets'])[0]])
+                    console.log(Object.keys(wb['Sheets'])[0])
+                    console.log(Object.keys(wb['Sheets'])[1])
+      const worksheetCells = wb['Sheets'][Object.keys(wb['Sheets'])[0]]
+      console.log(wb['Sheets'])
+
+      console.log(cellNames)
       
       const data = XLSX.utils.sheet_to_json((worksheetCells),{defval:""});
      
+      console.log(data)
+      var datasets=(getUniqueArrayValues(data.map(x => x['Dataset prefix']).filter(y=>
+      (!!y && !(y.includes("NA") || y.includes("Derived") || !y))
+      )))
+
+      console.log(datasets)
 
       var qvLinkURL=createBlobURL(data, ['Questionnaire prefix', 'Question Name', 'Dataset prefix', 'Variable Name'],
         { 'Questionnaire prefix': '_ccs01'}
@@ -109,15 +129,27 @@
 
       addLinkToPage(qvLinkURL, "qv.txt", "qv.txt", "qv")
 
-      var tvLinkURL=createBlobURL(data, ['Dataset prefix', 'Variable Name', 'Topic ID']) 
+      console.log(data)
+
+      datasets.forEach( x => {
+        console.log(x)
         
-      addLinkToPage(tvLinkURL, "tv.txt", "tv.txt", "tv")
+        var tvLinkURL=createBlobURL(data.filter(y => y['Dataset prefix']==x), ['Dataset prefix', 'Variable Name', 'Topic ID'])
+        addLinkToPage(tvLinkURL, `${x}_tv.txt`, `${x}_tv.txt`, `tv${x.replaceAll("_","-")}`)
+      })
+      
+      
+     // var tvLinkURL=createBlobURL(data, ['Dataset prefix', 'Variable Name', 'Topic ID']) 
+        
+     // addLinkToPage(tvLinkURL, "tv.txt", "tv.txt", "tv")
+        //}
+     // )
       
       var tqLinkURL=createBlobURL(data, ['Questionnaire prefix', 'Question Name', 'Topic ID'])
 
       addLinkToPage(tqLinkURL, "tq.txt", "tq.txt", "tq")
-
-      const data2 = XLSX.utils.sheet_to_json((wb['Sheets']['DV']),{defval:""});
+// get DV worksheet
+      const data2 = XLSX.utils.sheet_to_json((wb['Sheets'][Object.keys(wb['Sheets'])[1]]),{defval:""});
      
       
     //  NEED TO READ IN FROM DV SHEET NOW
@@ -130,7 +162,7 @@
   ])
 
       addLinkToPage(dvLinkURL, "dv.txt", "dv.txt", "dv")
-                    } catch(e) {document.getElementById("statusMessage").textContent = "Error parsing uploaded file."}
+                  //  } catch(e) {document.getElementById("statusMessage").textContent = "Error parsing uploaded file. " + e}
 
 
      
