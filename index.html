@@ -121,13 +121,25 @@ function getUniqueArrayValues(arrayData) {
       (!!y && !(y.includes("NA") || y.includes("Derived") || !y))
       )))
 
-      console.log(datasets)
+      var questionnairePrefixes=(getUniqueArrayValues(data.map(x => x['Questionnaire prefix']).filter(y=>
+      (!!y && !(y.includes("NA") || y.includes("Derived") || !y))
+      )))
 
+
+      console.log(datasets)
+/*
       var qvLinkURL=createBlobURL(data, ['Questionnaire prefix', 'Question Name', 'Dataset prefix', 'Variable Name'],
         { 'Questionnaire prefix': '_ccs01'}
       )
 
       addLinkToPage(qvLinkURL, "qv.txt", "qv.txt", "qv")
+*/
+      questionnairePrefixes.forEach( x => {
+        console.log(x)
+        
+        var qvLinkURL=createBlobURL(data.filter(y => y['Questionnaire prefix']==x), ['Questionnaire prefix', 'Question Name', 'Dataset prefix', 'Variable Name'])
+        addLinkToPage(qvLinkURL, `${x}_qv.txt`, `${x}_qv.txt`, `qv${x.replaceAll("_","-")}`)
+      })
 
       console.log(data)
 
@@ -145,9 +157,19 @@ function getUniqueArrayValues(arrayData) {
         //}
      // )
       
+     /*
       var tqLinkURL=createBlobURL(data, ['Questionnaire prefix', 'Question Name', 'Topic ID'])
 
       addLinkToPage(tqLinkURL, "tq.txt", "tq.txt", "tq")
+*/
+
+      questionnairePrefixes.forEach( x => {
+        console.log(x)
+        
+        var tqLinkURL=createBlobURL(data.filter(y => y['Questionnaire prefix']==x), ['Questionnaire prefix', 'Question Name', 'Topic ID'])
+        addLinkToPage(tqLinkURL, `${x}_tq.txt`, `${x}_tq.txt`, `tq${x.replaceAll("_","-")}`)
+      })
+
 // get DV worksheet
       const data2 = XLSX.utils.sheet_to_json((wb['Sheets'][Object.keys(wb['Sheets'])[1]]),{defval:""});
      
