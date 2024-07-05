@@ -137,7 +137,8 @@ function getUniqueArrayValues(arrayData) {
       questionnairePrefixes.forEach( x => {
         console.log(x)
         
-        var qvLinkURL=createBlobURL(data.filter(y => y['Questionnaire prefix']==x), ['Questionnaire prefix', 'Question Name', 'Dataset prefix', 'Variable Name'])
+        var qvLinkURL=createBlobURL(data.filter(y => y['Questionnaire prefix']==x), ['Questionnaire prefix', 'Question Name', 'Dataset prefix', 'Variable Name'],
+        { 'Questionnaire prefix': '_ccs01'})
         addLinkToPage(qvLinkURL, `${x}_qv.txt`, `${x}_qv.txt`, `qv${x.replaceAll("_","-")}`)
       })
 
@@ -166,7 +167,8 @@ function getUniqueArrayValues(arrayData) {
       questionnairePrefixes.forEach( x => {
         console.log(x)
         
-        var tqLinkURL=createBlobURL(data.filter(y => y['Questionnaire prefix']==x), ['Questionnaire prefix', 'Question Name', 'Topic ID'])
+        var tqLinkURL=createBlobURL(data.filter(y => y['Questionnaire prefix']==x), ['Questionnaire prefix', 'Question Name', 'Topic ID'],
+        { 'Questionnaire prefix': '_ccs01'})
         addLinkToPage(tqLinkURL, `${x}_tq.txt`, `${x}_tq.txt`, `tq${x.replaceAll("_","-")}`)
       })
 
