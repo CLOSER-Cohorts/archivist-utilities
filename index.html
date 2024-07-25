@@ -38,10 +38,10 @@
 
     }
 
-    function createBlobURL(worksheetDataByRows, columns, suffix = {}) {
+    function columnNamesToLowerCase(worksheetDataByRows) {
 
-      var fileData = ""
-
+      const rowValues = []
+        
       worksheetDataByRows.forEach(worksheetRow => {
 
         // We need to create a new object to hold the row data so we can ensure the
@@ -51,9 +51,23 @@
 
         Object.keys(worksheetRow).forEach(fieldName => rowData[fieldName.toLowerCase()] = worksheetRow[fieldName])
 
+        rowValues.push(rowData)
+
+      })
+
+      return rowValues
+
+    }
+
+    function createBlobURL(worksheetDataByRows, columns, suffix = {}) {
+
+      var fileData = ""
+
+      worksheetDataByRows.forEach(worksheetRow => {
+
         const rowValues = []
         
-        columns.map(columnName => rowValues.push(rowData[columnName.toLowerCase()] 
+        columns.map(columnName => rowValues.push(worksheetRow[columnName.toLowerCase()] 
           + (!!suffix[columnName] ? suffix[columnName] : "")))
 
         if (!(rowValues.includes("NA") || rowValues.includes("Derived") || rowValues.includes("")))
@@ -108,16 +122,17 @@
         
         const qvTvWorksheet = wb['Sheets'][Object.keys(wb['Sheets'])[0]]
 
-        const qvTvWorksheetOrderedByRows = XLSX.utils.sheet_to_json(qvTvWorksheet, { defval: "" });
+        const qvTvWorksheetOrderedByRows = columnNamesToLowerCase(
+          XLSX.utils.sheet_to_json(qvTvWorksheet, { defval: "" }))
 
         var datasetPrefixes = (getUniqueArrayValues(qvTvWorksheetOrderedByRows.map(
-          worksheetRow => worksheetRow['Dataset prefix']).filter(datasetPrefixCell =>
+          worksheetRow => worksheetRow['dataset prefix']).filter(datasetPrefixCell =>
             (!!datasetPrefixCell && !(datasetPrefixCell.includes("NA") 
             || datasetPrefixCell.includes("Derived") || !datasetPrefixCell))
         )))
 
         var questionnairePrefixes = (getUniqueArrayValues(qvTvWorksheetOrderedByRows.map(
-          worksheetRow => worksheetRow['Questionnaire prefix']).filter(questionnairePrefixCell =>
+          worksheetRow => worksheetRow['questionnaire prefix']).filter(questionnairePrefixCell =>
             (!!questionnairePrefixCell && !(questionnairePrefixCell.includes("NA") 
             || questionnairePrefixCell.includes("Derived") || !questionnairePrefixCell))
         )))
@@ -125,9 +140,9 @@
         questionnairePrefixes.forEach(questionnairePrefix => {
           
           var qvLinkURL = createBlobURL(qvTvWorksheetOrderedByRows.filter(
-            worksheetRow => worksheetRow['Questionnaire prefix'] == questionnairePrefix), 
-              ['Questionnaire prefix', 'Question Name', 'Dataset prefix', 'Variable Name'],
-              { 'Questionnaire prefix': '_ccs01' })
+            worksheetRow => worksheetRow['questionnaire prefix'] == questionnairePrefix), 
+              ['questionnaire prefix', 'question name', 'dataset prefix', 'variable name'],
+              { 'questionnaire prefix': '_ccs01' })
 
             addLinkToPage(qvLinkURL, 
             `${questionnairePrefix}_qv.txt`, 
@@ -139,8 +154,8 @@
         datasetPrefixes.forEach(datasetPrefix => {
           
           var tvLinkURL = createBlobURL(qvTvWorksheetOrderedByRows.filter(
-            worksheetRow => worksheetRow['Dataset prefix'] == datasetPrefix), 
-            ['Dataset prefix', 'Variable Name', 'Topic ID'])
+            worksheetRow => worksheetRow['dataset prefix'] == datasetPrefix), 
+            ['dataset prefix', 'variable name', 'topic id'])
           
           addLinkToPage(tvLinkURL, 
           `${datasetPrefix}_tv.txt`, 
@@ -152,22 +167,22 @@
         simplifiedData = []
 
         qvTvWorksheetOrderedByRows.forEach(worksheetRow => {
-          if (worksheetRow['Question Name'].includes("$")) {
-            indexOfDollarSign = worksheetRow['Question Name'].indexOf("$")
-            worksheetRow['Question Name'] = (worksheetRow['Question Name'].slice(0, indexOfDollarSign))
+          if (worksheetRow['question name'].includes("$")) {
+            indexOfDollarSign = worksheetRow['question name'].indexOf("$")
+            worksheetRow['question name'] = (worksheetRow['question name'].slice(0, indexOfDollarSign))
 
           }
-          if (simplifiedData.filter(dataRow => dataRow['Question Name'] == worksheetRow['Question Name']
-            && dataRow['Topic ID'] == worksheetRow['Topic ID']).length == 0)
+          if (simplifiedData.filter(dataRow => dataRow['question name'] == worksheetRow['question name']
+            && dataRow['topic id'] == worksheetRow['topic id']).length == 0)
             simplifiedData.push(worksheetRow)
         })
         
         questionnairePrefixes.forEach(questionnairePrefix => {
           
           var tqLinkURL = createBlobURL(simplifiedData.filter(
-            dataRow => dataRow['Questionnaire prefix'] == questionnairePrefix), 
-            ['Questionnaire prefix', 'Question Name', 'Topic ID'],
-            { 'Questionnaire prefix': '_ccs01' })
+            dataRow => dataRow['questionnaire prefix'] == questionnairePrefix), 
+            ['questionnaire prefix', 'question name', 'topic id'],
+            { 'questionnaire prefix': '_ccs01' })
           
           addLinkToPage(tqLinkURL, 
             `${questionnairePrefix}_tq.txt`, 
@@ -180,20 +195,21 @@
 
         const dvWorksheet = wb['Sheets'][Object.keys(wb['Sheets'])[1]]
 
-        const dvWorksheetOrderedByRows = XLSX.utils.sheet_to_json(dvWorksheet, { defval: "" });
+        const dvWorksheetOrderedByRows = columnNamesToLowerCase(
+          XLSX.utils.sheet_to_json(dvWorksheet, { defval: "" }))
 
         datasetPrefixes = (getUniqueArrayValues(dvWorksheetOrderedByRows.map(
-          worksheetRow => worksheetRow['Dataset prefix']).filter(datasetPrefixCell =>
+          worksheetRow => worksheetRow['dataset prefix']).filter(datasetPrefixCell =>
           (!!datasetPrefixCell 
           && !(datasetPrefixCell.includes("NA") || datasetPrefixCell.includes("Derived") || !datasetPrefixCell))
         )))
 
         datasetPrefixes.forEach(datasetPrefix => {
           var dvLinkURL = createBlobURL(dvWorksheetOrderedByRows.filter(
-            worksheetRow => worksheetRow['Dataset prefix'] == datasetPrefix), ["Dataset prefix",
-            "Derived Variable Name",
-            "Dataset prefix",
-            "Source Variable Name"
+            worksheetRow => worksheetRow['dataset prefix'] == datasetPrefix), ["dataset prefix",
+            "derived variable name",
+            "dataset prefix",
+            "source variable name"
           ])
           addLinkToPage(dvLinkURL, 
           `${datasetPrefix}_dv.txt`, 
@@ -208,7 +224,6 @@
     }
 
   </script>
-
 
 </body>
 
