@@ -70,7 +70,7 @@ The following column headers must be present in the first worksheet in the input
  - Derived variable name
  - Source variable name
 
- The headers are not case sensitive, i.e. a column called 'dataset prefix' instead of 'Dataset Prefix' is acceptable.
+The headers are not case sensitive, i.e. a column called 'dataset prefix' instead of 'Dataset Prefix' is acceptable.
 
 A separate dv text file will be created for each unique dataset prefix value in the input Excel file.
 
