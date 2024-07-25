@@ -4,7 +4,7 @@ This is a tool that implements the functionality described at https://ucldata.at
 
 The tool is accessible at https://closer-cohorts.github.io/archivist-utilities/
 
-It accepts as input an Excel file (.xslx)
+It accepts as input an Excel file (.xlsx)
 
 The worksheet containing data from which the qv, tv and tq mappings are created MUST be the first worksheet in the file. This worksheet can have any name.
 
