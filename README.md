@@ -30,7 +30,7 @@ For example, if some rows in the input worksheet had the value 'heaf_17_fup4' fo
 
 # TV mappings file
 
-The following column headers must be present in the first worksheet in the input Excel file, in order to create the qv text files:
+The following column headers must be present in the first worksheet in the input Excel file, in order to create the tv text files:
 
  - Dataset prefix
  - Variable name
