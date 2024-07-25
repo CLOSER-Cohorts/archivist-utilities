@@ -65,14 +65,9 @@
 
       worksheetDataByRows.forEach(worksheetRow => {
 
-        // We need to create a new object to hold the row data so we can ensure the
-        // field names of the object are all lower case...
-
-        var rowData = {}
-
         const rowValues = []
         
-        columns.map(columnName => rowValues.push(rowData[columnName.toLowerCase()] 
+        columns.map(columnName => rowValues.push(worksheetRow[columnName.toLowerCase()] 
           + (!!suffix[columnName] ? suffix[columnName] : "")))
 
         if (!(rowValues.includes("NA") || rowValues.includes("Derived") || rowValues.includes("")))
@@ -200,18 +195,17 @@
 
         const dvWorksheet = wb['Sheets'][Object.keys(wb['Sheets'])[1]]
 
-        const dvWorksheetOrderedByRows = XLSX.utils.sheet_to_json(dvWorksheet, { defval: "" });
+        const dvWorksheetOrderedByRows = columnNamesToLowerCase(
+          XLSX.utils.sheet_to_json(dvWorksheet, { defval: "" }))
 
-        const dvWorksheetOrderedByRows2 = columnNamesToLowerCase(dvWorksheetOrderedByRows)
-
-        datasetPrefixes = (getUniqueArrayValues(dvWorksheetOrderedByRows2.map(
+        datasetPrefixes = (getUniqueArrayValues(dvWorksheetOrderedByRows.map(
           worksheetRow => worksheetRow['dataset prefix']).filter(datasetPrefixCell =>
           (!!datasetPrefixCell 
           && !(datasetPrefixCell.includes("NA") || datasetPrefixCell.includes("Derived") || !datasetPrefixCell))
         )))
 
         datasetPrefixes.forEach(datasetPrefix => {
-          var dvLinkURL = createBlobURL(dvWorksheetOrderedByRows2.filter(
+          var dvLinkURL = createBlobURL(dvWorksheetOrderedByRows.filter(
             worksheetRow => worksheetRow['dataset prefix'] == datasetPrefix), ["dataset prefix",
             "derived variable name",
             "dataset prefix",
