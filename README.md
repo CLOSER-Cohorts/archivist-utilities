@@ -25,8 +25,8 @@ A separate qv text file will be created for each unique questionnaire prefix val
 
 For example, if some rows in the input worksheet had the value 'heaf_17_fup4' for the 'Questionnaire prefix' column, and some other rows had the value 'heaf_17_fup5' for that column, this would result in 2 text files being generated: 
  
- - heaf_17_fup4_qv.txt (containing all the rows which contained 'heaf_17_fup4' in the 'Questionnaire prefix' column)
- - heaf_17_fup5_qv.txt (containing all the rows which contained 'heaf_17_fup5' in the 'Questionnaire prefix' column)
+ - heaf_17_fup4_qv.txt (containing all the rows which had the value 'heaf_17_fup4' in the 'Questionnaire prefix' column)
+ - heaf_17_fup5_qv.txt (containing all the rows which had the value 'heaf_17_fup5' in the 'Questionnaire prefix' column)
 
 # TV mappings file
 
@@ -42,8 +42,8 @@ A separate tv text file will be created for each unique dataset prefix value in 
 
 For example, if some rows in the input worksheet had the value 'heaf_17_fup4' for the 'Dataset prefix' column, and some other rows had the value 'heaf_17_fup5' for that column, this would result in 2 text files being generated: 
  
- - heaf_17_fup4_tv.txt (containing all the rows which contained 'heaf_17_fup4' in the 'Dataset prefix' column)
- - heaf_17_fup5_tv.txt (containing all the rows which contained 'heaf_17_fup5' in the 'Dataset prefix' column)
+ - heaf_17_fup4_tv.txt (containing all the rows which had the value 'heaf_17_fup4' in the 'Dataset prefix' column)
+ - heaf_17_fup5_tv.txt (containing all the rows which had the value 'heaf_17_fup5' in the 'Dataset prefix' column)
  
 # TQ mappings file
 
@@ -59,8 +59,8 @@ A separate tq text file will be created for each unique questionnaire prefix val
 
 For example, if some rows in the input worksheet had the value 'heaf_17_fup4' for the 'Questionnaire prefix' column, and some other rows had the value 'heaf_17_fup5' for that column, this would result in 2 text files being generated: 
  
- - heaf_17_fup4_tq.txt (containing all the rows which contained 'heaf_17_fup4' in the 'Questionnaire prefix' column)
- - heaf_17_fup5_tq.txt (containing all the rows which contained 'heaf_17_fup5' in the 'Questionnaire prefix' column)
+ - heaf_17_fup4_tq.txt (containing all the rows which had the value 'heaf_17_fup4' in the 'Questionnaire prefix' column)
+ - heaf_17_fup5_tq.txt (containing all the rows which had the value 'heaf_17_fup5' in the 'Questionnaire prefix' column)
  
 # DV mappings file
 
@@ -76,8 +76,8 @@ A separate dv text file will be created for each unique dataset prefix value in 
 
 For example, if some rows in the input worksheet had the value 'heaf_17_fup4' for the 'Dataset prefix' column, and some other rows had the value 'heaf_17_fup5' for that column, this would result in 2 text files being generated: 
  
- - heaf_17_fup4_dv.txt (containing all the rows which contained 'heaf_17_fup4' in the 'Dataset prefix' column)
- - heaf_17_fup5_dv.txt (containing all the rows which contained 'heaf_17_fup5' in the 'Dataset prefix' column)
+ - heaf_17_fup4_dv.txt (containing all the rows which had the value 'heaf_17_fup4' in the 'Dataset prefix' column)
+ - heaf_17_fup5_dv.txt (containing all the rows which had the value 'heaf_17_fup5' in the 'Dataset prefix' column)
           
 # Text mapping file generation
 
