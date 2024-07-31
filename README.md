@@ -10,7 +10,7 @@ The worksheet containing data from which the qv, tv and tq mappings are created 
 
 The worksheet containing data from which the dv mappings are created MUST be the second worksheet in the file. This worksheet can have any name.
 
-# QV mappings file
+## QV mappings file
 
 The following column headers must be present in the first worksheet in the input Excel file, in order to create the qv text files:
 
@@ -28,7 +28,7 @@ For example, if some rows in the input worksheet had the value 'heaf_17_fup4' fo
  - heaf_17_fup4_qv.txt (containing all the rows which had the value 'heaf_17_fup4' in the 'Questionnaire prefix' column)
  - heaf_17_fup5_qv.txt (containing all the rows which had the value 'heaf_17_fup5' in the 'Questionnaire prefix' column)
 
-# TV mappings file
+## TV mappings file
 
 The following column headers must be present in the first worksheet in the input Excel file, in order to create the tv text files:
 
@@ -45,7 +45,7 @@ For example, if some rows in the input worksheet had the value 'heaf_17_fup4' fo
  - heaf_17_fup4_tv.txt (containing all the rows which had the value 'heaf_17_fup4' in the 'Dataset prefix' column)
  - heaf_17_fup5_tv.txt (containing all the rows which had the value 'heaf_17_fup5' in the 'Dataset prefix' column)
  
-# TQ mappings file
+## TQ mappings file
 
 The following column headers must be present in the first worksheet in the input Excel file, in order to create the tq text files:
 
@@ -62,7 +62,7 @@ For example, if some rows in the input worksheet had the value 'heaf_17_fup4' fo
  - heaf_17_fup4_tq.txt (containing all the rows which had the value 'heaf_17_fup4' in the 'Questionnaire prefix' column)
  - heaf_17_fup5_tq.txt (containing all the rows which had the value 'heaf_17_fup5' in the 'Questionnaire prefix' column)
  
-# DV mappings file
+## DV mappings file
 
 The following column headers must be present in the first worksheet in the input Excel file, in order to create the dv text files:
 
@@ -79,7 +79,7 @@ For example, if some rows in the input worksheet had the value 'heaf_17_fup4' fo
  - heaf_17_fup4_dv.txt (containing all the rows which had the value 'heaf_17_fup4' in the 'Dataset prefix' column)
  - heaf_17_fup5_dv.txt (containing all the rows which had the value 'heaf_17_fup5' in the 'Dataset prefix' column)
           
-# Text mapping file generation
+## Text mapping file generation
 
 To generate the text mapping files for Archivist from an Excel XLSX file, simply:
 
