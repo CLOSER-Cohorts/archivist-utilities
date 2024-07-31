@@ -116,6 +116,8 @@
 
       reader.onload = (function (event) {
 
+       try {
+
         const wb = XLSX.read(reader.result, { nullError: true });
 
         // Get QV and TV mappings worksheet...
@@ -188,8 +190,7 @@
             `${questionnairePrefix}_tq.txt`, 
             `${questionnairePrefix}_tq.txt`, 
             `tq${questionnairePrefix.replaceAll("_", "-")}`)
-        }
-      )
+        })
 
         // Get DV mappings worksheet...
 
@@ -216,6 +217,16 @@
           `${datasetPrefix}_dv.txt`, 
           `dv${datasetPrefix.replaceAll("_", "-")}`)
         })
+
+      } catch (error) {
+        document.getElementById("statusMessage").innerHTML = `Error processing selected input file. Error generated
+        by application: ${error}
+        <p>
+        Check that the file is correctly formatted, see <a target="_blank" href="https://github.com/CLOSER-Cohorts/archivist-utilities/blob/main/README.md">
+          https://github.com/CLOSER-Cohorts/archivist-utilities/blob/main/README.md
+          </a> for instructions on the required format for the input file.
+        `
+      }
 
       })
 
