@@ -1,6 +1,6 @@
 # archivist-utilities
 
-This is a tool that implements the functionality described at https://ucldata.atlassian.net/wiki/spaces/CLOS/pages/37323492/Using+Txt+Files
+This is a tool that implements the functionality described at https://wiki.ucl.ac.uk/display/CTTEAM/Mappings
 
 The tool is accessible at https://closer-cohorts.github.io/archivist-utilities/
 
