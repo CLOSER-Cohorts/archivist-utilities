@@ -1,18 +1,30 @@
 <html lang="en">
 <head>
-  <title>Archivist text mapping files generator</title>
+  <title>Archivist mapping files generator</title>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+  <style>
+    .paddedDiv{
+      margin: 20px
+    }
+  </style>
 </head>
 <body>
   <div style="font-size:20px; padding:5px">
     <h1>Generate text mappings files</h1>
     <div style="display:flex">
-      <div>
-        <label for="input">Select an input Excel (.xlsx) file from which Archivist text mapping files will be generated.</label>
-        <input id="input" type="file" /></div>
-      <div id="submitButton"></div>
+      <div style="flex-direction:column">
+        <div class="paddedDiv">
+          <label for="inputFileSelector">Select an input Excel (.xlsx) file from which Archivist text mapping files will be generated.</label>
+        </div>
+        <div class="paddedDiv" style="display:flex;flex-direction:row">
+          <input id="inputFileSelector" type="file" />
+          <div style="margin-left:20px" id="submitButton"></div>
+        </div>
+        
+      </div>
+      
     </div>
-    <div style="padding:5px" id="fileLinks"></div>
+    <div class="paddedDiv" id="fileLinks"></div>
     <div id="statusMessage"></div>
   </div>
 
@@ -86,7 +98,7 @@
 
     }
 
-    const inputElement = document.getElementById("input");
+    const inputElement = document.getElementById("inputFileSelector");
     
     inputElement.addEventListener("change", addConvertButton, false);
 
