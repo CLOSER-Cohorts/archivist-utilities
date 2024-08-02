@@ -6,12 +6,12 @@
 <body>
   <div style="font-size:20px; padding:5px">
     <h1>Generate text mappings files</h1>
-    <form id="selectInputFile">
     <div style="display:flex">
-      <div><input id="input" type="file" /></div>
+      <div>
+        <label>Select an input Excel (.xlsx) file from which Archivist text mapping files will be generated.</label>
+        <input id="input" type="file" /></div>
       <div id="submitButton"></div>
     </div>
-    </form>
     <div style="padding:5px" id="fileLinks"></div>
     <div id="statusMessage"></div>
   </div>
@@ -100,8 +100,6 @@
 
       submitButtonObject.textContent = "Convert file"
 
-      submitButtonObject.textContent = "submitButton"
-        
       submitButtonObject.addEventListener("click", () => handleFiles(fileList), false);
       
       submitButtonDiv.innerHTML = ""
