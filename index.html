@@ -109,12 +109,10 @@
       const createMappingsButtonDiv = document.getElementById("createMappingsButton");
       
       const createMappingsButtonObject = document.createElement("button");
-    
-      const createMappingsButtonAriaLabel = document.createElement("label");
+     
+      createMappingsButtonObject.textContent = "Create mappings"
 
-      createMappingsButtonObject.appendChild(createMappingsButtonAriaLabel)
-
-      createMappingsButtonAriaLabel.innerHTML = "Create mapping files"
+      createMappingsButtonObject.setAttribute('aria-label', 'Create mapping files')
 
       createMappingsButtonObject.addEventListener("click", () => handleFiles(fileList), false);
       
