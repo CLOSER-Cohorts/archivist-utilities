@@ -18,7 +18,7 @@
         </div>
         <div class="paddedDiv" style="display:flex;flex-direction:row">
           <input id="inputFileSelector" type="file" />
-          <div style="margin-left:20px" id="submitButton"></div>
+          <div style="margin-left:20px" id="createMappingsButton"></div>
         </div>
         
       </div>
@@ -106,21 +106,23 @@
 
       const fileList = this.files;
       
-      const submitButtonDiv = document.getElementById("submitButton");
+      const createMappingsButtonDiv = document.getElementById("createMappingsButton");
       
-      const submitButtonObject = document.createElement("button");
+      const createMappingsButtonObject = document.createElement("button");
+     
+      const createMappingsButtonAriaLabel = document.createElement("label");
 
-      submitButtonObject.textContent = "Convert file"
+      createMappingsButtonAriaLabel.innerHTML = "Create mapping files"
 
-      submitButtonObject.addEventListener("click", () => handleFiles(fileList), false);
+      createMappingsButtonObject.addEventListener("click", () => handleFiles(fileList), false);
       
-      submitButtonDiv.innerHTML = ""
+      createMappingsButtonDiv.innerHTML = ""
       
       document.getElementById("fileLinks").innerHTML = ""
       
       document.getElementById("statusMessage").textContent = ""
       
-      submitButtonDiv.appendChild(submitButtonObject)
+      createMappingsButtonDiv.appendChild(createMappingsButtonObject)
     
     }
 
