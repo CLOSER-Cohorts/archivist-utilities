@@ -12,6 +12,8 @@ The worksheet containing data from which the dv mappings are created MUST be the
 
 Any rows which do not contain all the coloumns listed below will not be present in the output.
 
+Any rows with cells containing 'NA' or 'Derived', or cells that are empty, will not be present in the output, as they do not contain sufficient information.
+
 ## QV mappings file
 
 The following column headers must be present in the first worksheet in the input Excel file, in order to create the qv text files:
