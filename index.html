@@ -86,7 +86,7 @@
         columns.map(columnName => rowValues.push(worksheetRow[columnName.toLowerCase()] 
           + (!!suffix[columnName] ? suffix[columnName] : "")))
 
-        if (!(rowValues.includes("NA") || rowValues.includes("Derived") || rowValues.includes("")))
+        if (!(rowValues.includes("N/A") || rowValues.includes("NA") || rowValues.includes("Derived") || rowValues.includes("")))
           fileData = fileData + rowValues.join("\t") + "\n"
       })
 
@@ -147,13 +147,15 @@
 
         var datasetPrefixes = (getUniqueArrayValues(qvTvWorksheetOrderedByRows.map(
           worksheetRow => worksheetRow['dataset prefix']).filter(datasetPrefixCell =>
-            (!!datasetPrefixCell && !(datasetPrefixCell.includes("NA") 
+            (!!datasetPrefixCell && !(datasetPrefixCell.includes("N/A") 
+            || datasetPrefixCell.includes("NA") 
             || datasetPrefixCell.includes("Derived") || !datasetPrefixCell))
         )))
 
         var questionnairePrefixes = (getUniqueArrayValues(qvTvWorksheetOrderedByRows.map(
           worksheetRow => worksheetRow['questionnaire prefix']).filter(questionnairePrefixCell =>
-            (!!questionnairePrefixCell && !(questionnairePrefixCell.includes("NA") 
+            (!!questionnairePrefixCell && !(questionnairePrefixCell.includes("N/A") 
+            || questionnairePrefixCell.includes("NA") 
             || questionnairePrefixCell.includes("Derived") || !questionnairePrefixCell))
         )))
 
@@ -220,7 +222,7 @@
         datasetPrefixes = (getUniqueArrayValues(dvWorksheetOrderedByRows.map(
           worksheetRow => worksheetRow['dataset prefix']).filter(datasetPrefixCell =>
           (!!datasetPrefixCell 
-          && !(datasetPrefixCell.includes("NA") || datasetPrefixCell.includes("Derived") || !datasetPrefixCell))
+          && !(datasetPrefixCell.includes("N/A") || datasetPrefixCell.includes("NA") || datasetPrefixCell.includes("Derived") || !datasetPrefixCell))
         )))
 
         datasetPrefixes.forEach(datasetPrefix => {
