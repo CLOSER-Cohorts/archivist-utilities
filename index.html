@@ -25,6 +25,7 @@
       
     </div>
     <div class="paddedDiv" id="fileLinks"></div>
+    <div class="paddedDiv" id="downloadAllFilesButton"></div>
     <div id="statusMessage"></div>
   </div>
 
@@ -48,9 +49,21 @@
 
       link.download = downloadedFilename
 
+      link.setAttribute('class', 'downloadFileLink')
+
       document.getElementById("fileLinks").appendChild(div)
 
       document.getElementById(pageDivId).appendChild(link)
+
+    }
+
+    function downloadAllFiles() {
+
+      const files = document.getElementsByClassName("downloadFileLink")
+      
+      Array.from(files).forEach(file => {
+        file.click()
+      })
 
     }
 
@@ -247,6 +260,18 @@
           </a> for instructions on the required format for the input file.
         `
       }
+
+      const downloadAllFilesButtonDiv = document.getElementById("createMappingsButton");
+      
+      const downloadAllFilesButtonObject = document.createElement("button");
+     
+      downloadAllFilesButtonObject.textContent = "Download all files"
+
+      downloadAllFilesButtonObject.setAttribute('aria-label', 'Download all mapping files')
+
+      downloadAllFilesButtonObject.addEventListener("click", () => downloadAllFiles(), false);
+
+      document.getElementById("downloadAllFilesButton").appendChild(downloadAllFilesButtonObject);
 
       })
 
