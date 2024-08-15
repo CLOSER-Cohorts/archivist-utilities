@@ -29,13 +29,13 @@
 
     </div>
     <div class="paddedDiv" id="fileLinks"></div>
-    <div class="paddedDiv" id="downloadAllFilesButton"></div>
+    <div class="paddedDiv" id="downloadAllFiles"></div>
     <div id="statusMessage"></div>
   </div>
 
   <script>
 
-    var zip = new JSZip();
+    var zip;
 
     function getUniqueArrayValues(arrayData) {
       return [...new Set(arrayData)]
@@ -73,13 +73,13 @@
 
       const labelDiv = document.createElement("div");
 
-      labelDiv.id = `${divId}-${linkLabel}`
+      labelDiv.id = `${divId}-label`
 
       labelDiv.innerHTML = linkLabel
 
       const linkDiv = document.createElement("div");
 
-      linkDiv.id = `${divId}-download-all-files`
+      linkDiv.id = `${divId}-link`
 
       linkDiv.setAttribute("class", "paddedDiv")
 
@@ -161,7 +161,11 @@
 
       document.getElementById("fileLinks").innerHTML = ""
 
+      document.getElementById("downloadAllFiles").innerHTML = ""
+
       document.getElementById("statusMessage").textContent = ""
+
+      zip = new JSZip();
 
       createMappingsButtonDiv.appendChild(createMappingsButtonObject)
 
@@ -302,7 +306,7 @@
             addLinkToExistingDiv(downloadLink,
               "allMappings.zip",
               "allMappings.zip",
-              "downloadAllFilesButton",
+              "downloadAllFiles",
               "Click the link below to download all the generated mapping files.")
 
           });
