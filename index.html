@@ -1,28 +1,32 @@
 <html lang="en">
+
 <head>
   <title>Archivist mapping files generator</title>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+  <script src="jszip.min.js"></script>
   <style>
-    .paddedDiv{
+    .paddedDiv {
       margin: 20px
     }
   </style>
 </head>
+
 <body>
   <div style="font-size:20px; padding:5px">
     <h1>Generate text mappings files</h1>
     <div style="display:flex">
       <div style="flex-direction:column">
         <div class="paddedDiv">
-          <label for="inputFileSelector">Select an input Excel (.xlsx) file from which Archivist text mapping files will be generated.</label>
+          <label for="inputFileSelector">Select an input Excel (.xlsx) file from which Archivist text mapping files will
+            be generated.</label>
         </div>
         <div class="paddedDiv" style="display:flex;flex-direction:row">
           <input id="inputFileSelector" type="file" />
           <div style="margin-left:20px" id="createMappingsButton"></div>
         </div>
-        
+
       </div>
-      
+
     </div>
     <div class="paddedDiv" id="fileLinks"></div>
     <div class="paddedDiv" id="downloadAllFilesButton"></div>
@@ -31,11 +35,13 @@
 
   <script>
 
+    var zip = new JSZip();
+
     function getUniqueArrayValues(arrayData) {
       return [...new Set(arrayData)]
     }
 
-    function addLinkToPage(linkURL, linkText, downloadedFilename, pageDivId) {
+    function addLinkToNewDiv(linkURL, linkText, downloadedFilename, pageDivId) {
 
       const link = document.createElement("a");
 
@@ -49,28 +55,46 @@
 
       link.download = downloadedFilename
 
-      link.setAttribute('class', 'downloadFileLink')
-
       document.getElementById("fileLinks").appendChild(div)
 
       document.getElementById(pageDivId).appendChild(link)
 
     }
 
-    function downloadAllFiles() {
+    function addLinkToExistingDiv(linkURL, linkText, downloadedFilename, divId, linkLabel) {
 
-      const files = document.getElementsByClassName("downloadFileLink")
-      
-      Array.from(files).forEach(file => {
-        file.click()
-      })
+      const link = document.createElement("a");
+
+      link.href = linkURL
+
+      link.text = linkText
+
+      link.download = downloadedFilename
+
+      const labelDiv = document.createElement("div");
+
+      labelDiv.id = `${divId}-${linkLabel}`
+
+      labelDiv.innerHTML = linkLabel
+
+      const linkDiv = document.createElement("div");
+
+      linkDiv.id = `${divId}-download-all-files`
+
+      linkDiv.setAttribute("class", "paddedDiv")
+
+      linkDiv.appendChild(link)
+
+      document.getElementById(divId).appendChild(labelDiv)
+
+      document.getElementById(divId).appendChild(linkDiv)
 
     }
 
     function columnNamesToLowerCase(worksheetDataByRows) {
 
       const rowValues = []
-        
+
       worksheetDataByRows.forEach(worksheetRow => {
 
         // We need to create a new object to hold the row data so we can ensure the
@@ -88,15 +112,15 @@
 
     }
 
-    function createBlobURL(worksheetDataByRows, columns, suffix = {}) {
+    function createBlobURL(worksheetDataByRows, columns, fileName, suffix = {}) {
 
       var fileData = ""
 
       worksheetDataByRows.forEach(worksheetRow => {
 
         const rowValues = []
-        
-        columns.map(columnName => rowValues.push(worksheetRow[columnName.toLowerCase()] 
+
+        columns.map(columnName => rowValues.push(worksheetRow[columnName.toLowerCase()]
           + (!!suffix[columnName] ? suffix[columnName] : "")))
 
         if (!(rowValues.includes("N/A") || rowValues.includes("NA") || rowValues.includes("Derived") || rowValues.includes("")))
@@ -105,6 +129,8 @@
 
       var formBlob = new Blob([fileData], { type: 'text/plain' });
 
+      zip.file(fileName, fileData);
+
       const downloadLink = window.URL.createObjectURL(formBlob);
 
       return downloadLink
@@ -112,31 +138,31 @@
     }
 
     const inputElement = document.getElementById("inputFileSelector");
-    
+
     inputElement.addEventListener("change", addConvertButton, false);
 
     function addConvertButton() {
 
       const fileList = this.files;
-      
+
       const createMappingsButtonDiv = document.getElementById("createMappingsButton");
-      
+
       const createMappingsButtonObject = document.createElement("button");
-     
+
       createMappingsButtonObject.textContent = "Create mappings"
 
       createMappingsButtonObject.setAttribute('aria-label', 'Create mapping files')
 
       createMappingsButtonObject.addEventListener("click", () => handleFiles(fileList), false);
-      
+
       createMappingsButtonDiv.innerHTML = ""
-      
+
       document.getElementById("fileLinks").innerHTML = ""
-      
+
       document.getElementById("statusMessage").textContent = ""
-      
+
       createMappingsButtonDiv.appendChild(createMappingsButtonObject)
-    
+
     }
 
     function handleFiles(fileList) {
@@ -147,131 +173,135 @@
 
       reader.onload = (function (event) {
 
-       try {
+        try {
 
-        const wb = XLSX.read(reader.result, { nullError: true });
+          const wb = XLSX.read(reader.result, { nullError: true });
 
-        // Get QV and TV mappings worksheet...
-        
-        const qvTvWorksheet = wb['Sheets'][Object.keys(wb['Sheets'])[0]]
+          // Get QV and TV mappings worksheet...
 
-        const qvTvWorksheetOrderedByRows = columnNamesToLowerCase(
-          XLSX.utils.sheet_to_json(qvTvWorksheet, { defval: "" }))
+          const qvTvWorksheet = wb['Sheets'][Object.keys(wb['Sheets'])[0]]
 
-        var datasetPrefixes = (getUniqueArrayValues(qvTvWorksheetOrderedByRows.map(
-          worksheetRow => worksheetRow['dataset prefix']).filter(datasetPrefixCell =>
-            (!!datasetPrefixCell && !(datasetPrefixCell.includes("N/A") 
-            || datasetPrefixCell.includes("NA") 
-            || datasetPrefixCell.includes("Derived") || !datasetPrefixCell))
-        )))
+          const qvTvWorksheetOrderedByRows = columnNamesToLowerCase(
+            XLSX.utils.sheet_to_json(qvTvWorksheet, { defval: "" }))
 
-        var questionnairePrefixes = (getUniqueArrayValues(qvTvWorksheetOrderedByRows.map(
-          worksheetRow => worksheetRow['questionnaire prefix']).filter(questionnairePrefixCell =>
-            (!!questionnairePrefixCell && !(questionnairePrefixCell.includes("N/A") 
-            || questionnairePrefixCell.includes("NA") 
-            || questionnairePrefixCell.includes("Derived") || !questionnairePrefixCell))
-        )))
+          var datasetPrefixes = (getUniqueArrayValues(qvTvWorksheetOrderedByRows.map(
+            worksheetRow => worksheetRow['dataset prefix']).filter(datasetPrefixCell =>
+            (!!datasetPrefixCell && !(datasetPrefixCell.includes("N/A")
+              || datasetPrefixCell.includes("NA")
+              || datasetPrefixCell.includes("Derived") || !datasetPrefixCell))
+            )))
 
-        questionnairePrefixes.forEach(questionnairePrefix => {
-          
-          var qvLinkURL = createBlobURL(qvTvWorksheetOrderedByRows.filter(
-            worksheetRow => worksheetRow['questionnaire prefix'] == questionnairePrefix), 
+          var questionnairePrefixes = (getUniqueArrayValues(qvTvWorksheetOrderedByRows.map(
+            worksheetRow => worksheetRow['questionnaire prefix']).filter(questionnairePrefixCell =>
+            (!!questionnairePrefixCell && !(questionnairePrefixCell.includes("N/A")
+              || questionnairePrefixCell.includes("NA")
+              || questionnairePrefixCell.includes("Derived") || !questionnairePrefixCell))
+            )))
+
+          questionnairePrefixes.forEach(questionnairePrefix => {
+
+            var qvLinkURL = createBlobURL(qvTvWorksheetOrderedByRows.filter(
+              worksheetRow => worksheetRow['questionnaire prefix'] == questionnairePrefix),
               ['questionnaire prefix', 'question name', 'dataset prefix', 'variable name'],
+              `${questionnairePrefix}_qv.txt`,
               { 'questionnaire prefix': '_ccs01' })
 
-            addLinkToPage(qvLinkURL, 
-            `${questionnairePrefix}_qv.txt`, 
-            `${questionnairePrefix}_qv.txt`, 
-            `qv${questionnairePrefix.replaceAll("_", "-")}`)
-        
+            addLinkToNewDiv(qvLinkURL,
+              `${questionnairePrefix}_qv.txt`,
+              `${questionnairePrefix}_qv.txt`,
+              `qv${questionnairePrefix.replaceAll("_", "-")}`)
+
           })
 
-        datasetPrefixes.forEach(datasetPrefix => {
-          
-          var tvLinkURL = createBlobURL(qvTvWorksheetOrderedByRows.filter(
-            worksheetRow => worksheetRow['dataset prefix'] == datasetPrefix), 
-            ['dataset prefix', 'variable name', 'topic id'])
-          
-          addLinkToPage(tvLinkURL, 
-          `${datasetPrefix}_tv.txt`, 
-          `${datasetPrefix}_tv.txt`, 
-          `tv${datasetPrefix.replaceAll("_", "-")}`)
-        
-        })
+          datasetPrefixes.forEach(datasetPrefix => {
 
-        simplifiedData = []
+            var tvLinkURL = createBlobURL(qvTvWorksheetOrderedByRows.filter(
+              worksheetRow => worksheetRow['dataset prefix'] == datasetPrefix),
+              ['dataset prefix', 'variable name', 'topic id'],
+              `${datasetPrefix}_tv.txt`)
 
-        qvTvWorksheetOrderedByRows.forEach(worksheetRow => {
-          if (worksheetRow['question name'].includes("$")) {
-            indexOfDollarSign = worksheetRow['question name'].indexOf("$")
-            worksheetRow['question name'] = (worksheetRow['question name'].slice(0, indexOfDollarSign))
+            addLinkToNewDiv(tvLinkURL,
+              `${datasetPrefix}_tv.txt`,
+              `${datasetPrefix}_tv.txt`,
+              `tv${datasetPrefix.replaceAll("_", "-")}`)
 
-          }
-          if (simplifiedData.filter(dataRow => dataRow['question name'] == worksheetRow['question name']
-            && dataRow['topic id'] == worksheetRow['topic id']).length == 0)
-            simplifiedData.push(worksheetRow)
-        })
-        
-        questionnairePrefixes.forEach(questionnairePrefix => {
-          
-          var tqLinkURL = createBlobURL(simplifiedData.filter(
-            dataRow => dataRow['questionnaire prefix'] == questionnairePrefix), 
-            ['questionnaire prefix', 'question name', 'topic id'],
-            { 'questionnaire prefix': '_ccs01' })
-          
-          addLinkToPage(tqLinkURL, 
-            `${questionnairePrefix}_tq.txt`, 
-            `${questionnairePrefix}_tq.txt`, 
-            `tq${questionnairePrefix.replaceAll("_", "-")}`)
-        })
+          })
 
-        // Get DV mappings worksheet...
+          simplifiedData = []
 
-        const dvWorksheet = wb['Sheets'][Object.keys(wb['Sheets'])[1]]
+          qvTvWorksheetOrderedByRows.forEach(worksheetRow => {
+            if (worksheetRow['question name'].includes("$")) {
+              indexOfDollarSign = worksheetRow['question name'].indexOf("$")
+              worksheetRow['question name'] = (worksheetRow['question name'].slice(0, indexOfDollarSign))
 
-        const dvWorksheetOrderedByRows = columnNamesToLowerCase(
-          XLSX.utils.sheet_to_json(dvWorksheet, { defval: "" }))
+            }
+            if (simplifiedData.filter(dataRow => dataRow['question name'] == worksheetRow['question name']
+              && dataRow['topic id'] == worksheetRow['topic id']).length == 0)
+              simplifiedData.push(worksheetRow)
+          })
 
-        datasetPrefixes = (getUniqueArrayValues(dvWorksheetOrderedByRows.map(
-          worksheetRow => worksheetRow['dataset prefix']).filter(datasetPrefixCell =>
-          (!!datasetPrefixCell 
-          && !(datasetPrefixCell.includes("N/A") || datasetPrefixCell.includes("NA") || datasetPrefixCell.includes("Derived") || !datasetPrefixCell))
-        )))
+          questionnairePrefixes.forEach(questionnairePrefix => {
 
-        datasetPrefixes.forEach(datasetPrefix => {
-          var dvLinkURL = createBlobURL(dvWorksheetOrderedByRows.filter(
-            worksheetRow => worksheetRow['dataset prefix'] == datasetPrefix), ["dataset prefix",
-            "derived variable name",
-            "dataset prefix",
-            "source variable name"
-          ])
-          addLinkToPage(dvLinkURL, 
-          `${datasetPrefix}_dv.txt`, 
-          `${datasetPrefix}_dv.txt`, 
-          `dv${datasetPrefix.replaceAll("_", "-")}`)
-        })
+            var tqLinkURL = createBlobURL(simplifiedData.filter(
+              dataRow => dataRow['questionnaire prefix'] == questionnairePrefix),
+              ['questionnaire prefix', 'question name', 'topic id'],
+              `${questionnairePrefix}_tq.txt`,
+              { 'questionnaire prefix': '_ccs01' })
 
-      } catch (error) {
-        document.getElementById("statusMessage").innerHTML = `Error processing selected input file. Error generated
+            addLinkToNewDiv(tqLinkURL,
+              `${questionnairePrefix}_tq.txt`,
+              `${questionnairePrefix}_tq.txt`,
+              `tq${questionnairePrefix.replaceAll("_", "-")}`)
+          })
+
+          // Get DV mappings worksheet...
+
+          const dvWorksheet = wb['Sheets'][Object.keys(wb['Sheets'])[1]]
+
+          const dvWorksheetOrderedByRows = columnNamesToLowerCase(
+            XLSX.utils.sheet_to_json(dvWorksheet, { defval: "" }))
+
+          datasetPrefixes = (getUniqueArrayValues(dvWorksheetOrderedByRows.map(
+            worksheetRow => worksheetRow['dataset prefix']).filter(datasetPrefixCell =>
+            (!!datasetPrefixCell
+              && !(datasetPrefixCell.includes("N/A") || datasetPrefixCell.includes("NA") || datasetPrefixCell.includes("Derived") || !datasetPrefixCell))
+            )))
+
+          datasetPrefixes.forEach(datasetPrefix => {
+            var dvLinkURL = createBlobURL(dvWorksheetOrderedByRows.filter(
+              worksheetRow => worksheetRow['dataset prefix'] == datasetPrefix), ["dataset prefix",
+              "derived variable name",
+              "dataset prefix",
+              "source variable name"
+            ],
+              `${datasetPrefix}_dv.txt`)
+
+            addLinkToNewDiv(dvLinkURL,
+              `${datasetPrefix}_dv.txt`,
+              `${datasetPrefix}_dv.txt`,
+              `dv${datasetPrefix.replaceAll("_", "-")}`)
+          })
+
+        } catch (error) {
+          document.getElementById("statusMessage").innerHTML = `Error processing selected input file. Error generated
         by application: ${error}
         <p>
         Check that the file is correctly formatted, see <a target="_blank" href="https://github.com/CLOSER-Cohorts/archivist-utilities/blob/main/README.md">
           https://github.com/CLOSER-Cohorts/archivist-utilities/blob/main/README.md
           </a> for instructions on the required format for the input file.
         `
-      }
+        }
 
-      const downloadAllFilesButtonDiv = document.getElementById("createMappingsButton");
-      
-      const downloadAllFilesButtonObject = document.createElement("button");
-     
-      downloadAllFilesButtonObject.textContent = "Download all files"
+        zip.generateAsync({ type: "blob" })
+          .then(function (content) {
+            const downloadLink = window.URL.createObjectURL(content);
+            addLinkToExistingDiv(downloadLink,
+              "allMappings.zip",
+              "allMappings.zip",
+              "downloadAllFilesButton",
+              "Click the link below to download all the generated mapping files.")
 
-      downloadAllFilesButtonObject.setAttribute('aria-label', 'Download all mapping files')
-
-      downloadAllFilesButtonObject.addEventListener("click", () => downloadAllFiles(), false);
-
-      document.getElementById("downloadAllFilesButton").appendChild(downloadAllFilesButtonObject);
+          });
 
       })
 
