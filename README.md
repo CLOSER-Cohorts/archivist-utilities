@@ -10,7 +10,7 @@ The worksheet containing data from which the qv, tv and tq mappings are created 
 
 The worksheet containing data from which the dv mappings are created MUST be the second worksheet in the file. This worksheet can have any name.
 
-Any rows which do not contain all the coloumns listed below will not be present in the output.
+Any rows which do not contain all the columns listed below will not be present in the output.
 
 Any rows with cells containing 'NA' or 'Derived', or cells that are empty, will not be present in the output, as they do not contain sufficient information.
 
