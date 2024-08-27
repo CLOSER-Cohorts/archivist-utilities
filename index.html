@@ -124,8 +124,12 @@
           + (!!suffix[columnName] ? suffix[columnName] : "")))
 
         const lowerCaseRowValues = rowValues.map(rowValue => rowValue.toLowerCase())
-
-        if (!(lowerCaseRowValues.includes("n/a") || lowerCaseRowValues.includes("na") || lowerCaseRowValues.includes("derived") || lowerCaseRowValues.includes("")))
+       
+        if (!(lowerCaseRowValues.includes("n/a") 
+        || lowerCaseRowValues.includes("na") 
+        || lowerCaseRowValues.includes("derived")
+        || lowerCaseRowValues.includes("undefined") 
+        || lowerCaseRowValues.includes("")))
           fileData = fileData + rowValues.join("\t") + "\n"
       })
 
