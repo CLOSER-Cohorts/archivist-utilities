@@ -135,7 +135,7 @@
 
       const downloadLink = window.URL.createObjectURL(formBlob);
 
-      return downloadLink
+      return formBlob.size > 0 ? downloadLink : null
 
     }
 
@@ -212,7 +212,7 @@
               `${questionnairePrefix}_qv.txt`,
               { 'questionnaire prefix': '_ccs01' })
 
-            addLinkToNewDiv(qvLinkURL,
+            !!qvLinkURL && addLinkToNewDiv(qvLinkURL,
               `${questionnairePrefix}_qv.txt`,
               `${questionnairePrefix}_qv.txt`,
               `qv${questionnairePrefix.replaceAll("_", "-")}`)
