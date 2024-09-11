@@ -226,7 +226,7 @@
               ['dataset prefix', 'variable name', 'topic id'],
               `${datasetPrefix}_tv.txt`)
 
-            addLinkToNewDiv(tvLinkURL,
+            !!tvLinkUrl && addLinkToNewDiv(tvLinkURL,
               `${datasetPrefix}_tv.txt`,
               `${datasetPrefix}_tv.txt`,
               `tv${datasetPrefix.replaceAll("_", "-")}`)
@@ -254,7 +254,7 @@
               `${questionnairePrefix}_tq.txt`,
               { 'questionnaire prefix': '_ccs01' })
 
-            addLinkToNewDiv(tqLinkURL,
+            !!tqLinkUrl && addLinkToNewDiv(tqLinkURL,
               `${questionnairePrefix}_tq.txt`,
               `${questionnairePrefix}_tq.txt`,
               `tq${questionnairePrefix.replaceAll("_", "-")}`)
@@ -284,7 +284,7 @@
             ],
               `${datasetPrefix}_dv.txt`)
 
-            addLinkToNewDiv(dvLinkURL,
+            !!dvLinkUrl && addLinkToNewDiv(dvLinkURL,
               `${datasetPrefix}_dv.txt`,
               `${datasetPrefix}_dv.txt`,
               `dv${datasetPrefix.replaceAll("_", "-")}`)
