@@ -123,7 +123,7 @@
         columns.map(columnName => rowValues.push(worksheetRow[columnName.toLowerCase()]
           + (!!suffix[columnName] ? suffix[columnName] : "")))
 
-        const lowerCaseRowValues = rowValues.map(rowValue => rowValue.toLowerCase())
+        const lowerCaseRowValues = rowValues.map(rowValue => rowValue.trim().toLowerCase())
 
         if (!(lowerCaseRowValues.includes("n/a") || lowerCaseRowValues.includes("na") || lowerCaseRowValues.includes("derived") || lowerCaseRowValues.includes("")))
           fileData = fileData + rowValues.join("\t") + "\n"
@@ -194,14 +194,14 @@
           worksheetRow => worksheetRow['dataset prefix']).filter(datasetPrefixCell =>
             (!!datasetPrefixCell && !(datasetPrefixCell.toLowerCase().includes("n/a") 
             || datasetPrefixCell.toLowerCase().includes("na") 
-            || datasetPrefixCell.toLowerCase().includes("derived") || !datasetPrefixCell))
+            || datasetPrefixCell.toLowerCase().includes("derived") || !datasetPrefixCell.trim()))
         )))
 
         var questionnairePrefixes = (getUniqueArrayValues(qvTvWorksheetOrderedByRows.map(
           worksheetRow => worksheetRow['questionnaire prefix']).filter(questionnairePrefixCell =>
             (!!questionnairePrefixCell && !(questionnairePrefixCell.toLowerCase().includes("n/a") 
             || questionnairePrefixCell.toLowerCase().includes("na") 
-            || questionnairePrefixCell.toLowerCase().includes("derived") || !questionnairePrefixCell))
+            || questionnairePrefixCell.toLowerCase().includes("derived") || !questionnairePrefixCell.trim()))
         )))
 
           questionnairePrefixes.forEach(questionnairePrefix => {
@@ -272,7 +272,7 @@
           (!!datasetPrefixCell 
           && !(datasetPrefixCell.toLowerCase().includes("n/a") 
           || datasetPrefixCell.toLowerCase().includes("na") 
-          || datasetPrefixCell.toLowerCase().includes("derived") || !datasetPrefixCell))
+          || datasetPrefixCell.toLowerCase().includes("derived") || !datasetPrefixCell.trim()))
         )))
 
           datasetPrefixes.forEach(datasetPrefix => {
