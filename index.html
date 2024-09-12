@@ -131,7 +131,9 @@
 
       var formBlob = new Blob([fileData], { type: 'text/plain' });
 
-      zip.file(fileName, fileData);
+      if (formBlob.size > 0)
+
+          zip.file(fileName, fileData);
 
       const downloadLink = window.URL.createObjectURL(formBlob);
 
@@ -173,11 +175,13 @@
 
     function handleFiles(fileList) {
 
-      document.getElementById("fileLinks").innerHTML = ""
-
       const reader = new FileReader()
 
       reader.onload = (function (event) {
+
+        document.getElementById("fileLinks").innerHTML = ""
+
+        document.getElementById("downloadAllFiles").innerHTML = ""
 
         try {
 
@@ -226,7 +230,7 @@
               ['dataset prefix', 'variable name', 'topic id'],
               `${datasetPrefix}_tv.txt`)
 
-            !!tvLinkUrl && addLinkToNewDiv(tvLinkURL,
+            !!tvLinkURL && addLinkToNewDiv(tvLinkURL,
               `${datasetPrefix}_tv.txt`,
               `${datasetPrefix}_tv.txt`,
               `tv${datasetPrefix.replaceAll("_", "-")}`)
@@ -254,7 +258,7 @@
               `${questionnairePrefix}_tq.txt`,
               { 'questionnaire prefix': '_ccs01' })
 
-            !!tqLinkUrl && addLinkToNewDiv(tqLinkURL,
+            !!tqLinkURL && addLinkToNewDiv(tqLinkURL,
               `${questionnairePrefix}_tq.txt`,
               `${questionnairePrefix}_tq.txt`,
               `tq${questionnairePrefix.replaceAll("_", "-")}`)
@@ -284,10 +288,11 @@
             ],
               `${datasetPrefix}_dv.txt`)
 
-            !!dvLinkUrl && addLinkToNewDiv(dvLinkURL,
+            dvLinkURL && addLinkToNewDiv(dvLinkURL,
               `${datasetPrefix}_dv.txt`,
               `${datasetPrefix}_dv.txt`,
               `dv${datasetPrefix.replaceAll("_", "-")}`)
+              
           })
 
         } catch (error) {
@@ -300,16 +305,24 @@
         `
         }
 
-        zip.generateAsync({ type: "blob" })
-          .then(function (content) {
-            const downloadLink = window.URL.createObjectURL(content);
-            addLinkToExistingDiv(downloadLink,
-              "allMappings.zip",
-              "allMappings.zip",
-              "downloadAllFiles",
-              "Click the link below to download all the generated mapping files.")
-
+        if (Object.keys(zip.files).length > 0) {
+          zip.generateAsync({ type: "blob" })
+            .then(function (content) {
+              const downloadLink = window.URL.createObjectURL(content);
+              addLinkToExistingDiv(downloadLink,
+                "allMappings.zip",
+                "allMappings.zip",
+                "downloadAllFiles",
+                "Click the link below to download all the generated mapping files.")
           });
+        }
+
+        else {
+
+          document.getElementById("downloadAllFiles")
+            .innerHTML = "Insufficient data in input spreadsheet to generate any mapping files."
+          
+        }
 
       })
 
