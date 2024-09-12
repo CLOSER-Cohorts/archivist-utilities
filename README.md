@@ -70,7 +70,7 @@ For example, if some rows in the input worksheet had the value 'heaf_17_fup4' fo
  
 ## DV mappings file
 
-The following column headers must be present in the first worksheet in the input Excel file, in order to create the dv text files:
+The following column headers must be present in the second worksheet in the input Excel file, in order to create the dv text files:
 
  - Dataset prefix
  - Derived variable name
