@@ -34,7 +34,7 @@ The 'DV' worksheet MUST contain column headings with the following titles:
 - Source Dataset prefix
 - Source Variable Name
 
-When generating mapping files from the input spreadsheet, data from rows which do not contain all the required columns (as listed below for each mapping file) will not be present in the generated output.
+When generating mapping files from the input spreadsheet, if a worksheet row contains insufficient information, i.e. it doesn't contain values in all required cells, that row will not be used in the creation of the mapping file. The columns required for each type of mapping file are listed below.
 
 Any rows with cells containing 'NA' or 'Derived' (not case-sensitive), or cells that are empty or only contain whitespace, will not be present in the output, as they do not contain sufficient information.
 
@@ -81,7 +81,7 @@ The following column headers must be present in the 'QV and TV Mappings' workshe
  - Question name
  - Topic id
 
-The headers are not case sensitive, i.e. a column called 'question name' instead of 'Question Name' is acceptable. For rows which have the same topic ID but different grid cells (e.g. qc_1$1;1), all but one will be removed and this will have the suffix removed (e.g. qc_1) to allow for loading into Archivist which only allows one topic per question. 
+The headers are not case sensitive, i.e. a column called 'question name' instead of 'Question Name' is acceptable. For rows which have the same topic ID but different grid cells (e.g. qc_1$1;1), all but one will be removed and this will have the suffix removed (e.g. resulting in qc_1) to allow for loading into Archivist which only allows one topic per question. 
 
 A separate tq text file will be created for each unique questionnaire prefix value in the input Excel file.
 For example, if some rows in the input worksheet had the value 'heaf_17_fup4' for the 'Questionnaire prefix' column, and some other rows had the value 'heaf_17_fup5' for that column, this would result in 2 text files being generated: 
