@@ -287,7 +287,7 @@
             XLSX.utils.sheet_to_json(dvWorksheet, { defval: "" }))
 
         datasetPrefixes = (getUniqueArrayValues(dvWorksheetOrderedByRows.map(
-          worksheetRow => worksheetRow['source dataset prefix']).filter(datasetPrefixCell =>
+          worksheetRow => worksheetRow['derived dataset prefix']).filter(datasetPrefixCell =>
           (!!datasetPrefixCell 
           && !(datasetPrefixCell.toLowerCase().includes("n/a") 
           || datasetPrefixCell.toLowerCase().includes("na") 
@@ -298,7 +298,7 @@
 
           datasetPrefixes.forEach(datasetPrefix => {
             dvLinkURL = createBlobURL(dvWorksheetOrderedByRows.filter(
-              worksheetRow => worksheetRow['source dataset prefix'] == datasetPrefix), ["derived dataset prefix",
+              worksheetRow => worksheetRow['derived dataset prefix'] == datasetPrefix), ["derived dataset prefix",
               "derived variable name",
               "source dataset prefix",
               "source variable name"
