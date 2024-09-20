@@ -35,9 +35,9 @@ The 'DV' worksheet MUST contain column headings with the following titles:
 - Source Dataset prefix
 - Source Variable Name
 
-When generating mapping files from the input spreadsheet, if a worksheet row contains insufficient information, i.e. it doesn't contain values in all required cells, that row will not be used in the creation of the mapping file. The columns required for each type of mapping file are listed below.
+When generating mapping files from the input spreadsheet, if a worksheet row contains insufficient information, i.e. it doesn't contain values in all required cells, that row will not be used in the creation of a mapping file. The columns required for each type of mapping file are listed below.
 
-Any rows with cells containing 'NA' or 'Derived' (not case-sensitive), or cells that are empty or only contain whitespace, will not be present in the output, as they do not contain sufficient information.
+Any rows with cells containing 'NA' or 'Derived' (not case-sensitive), or cells that are empty or only contain whitespace, will also not be used to generate the output mappings, as they do not contain sufficient information.
 
 ## QV mappings file
 
@@ -113,5 +113,5 @@ For example, if some rows in the 'DV' worksheet had the value 'heaf_17_fup4' for
 To generate the text mapping files for Archivist from an Excel XLSX file, simply:
 
 1. Select the Excel XLSX file from your local computer by pressing the 'Choose file' button
-2. A 'Convert file' button will appear after you have selected an XLSX file. Press this button.
+2. A 'Create mappings' button will appear after you have selected an XLSX file. Press this button.
 3. Links to the various text files generated from this XLSX file will now displayed on the screen, and clicking on these will download the files to your local computer.
