@@ -316,10 +316,6 @@
 
             document.getElementById("statusMessage").innerHTML += `Please check that uploaded input has a valid structure:`
 
-        if (!dvLinkURL) 
-              
-            document.getElementById("statusMessageDetails").innerHTML += `- Unable to create dv mappings file.<br>`  
-                
         if (!qvLinkURL) 
               
             document.getElementById("statusMessageDetails").innerHTML += `- Unable to create qv mappings file.<br>`  
@@ -331,7 +327,11 @@
         if (!tqLinkURL) 
             
             document.getElementById("statusMessageDetails").innerHTML += `- Unable to create tq mappings file.<br>`
-
+        
+        if (!dvLinkURL) 
+              
+            document.getElementById("statusMessageDetails").innerHTML += `- Unable to create dv mappings file.<br>`      
+          
         } catch (error) {
           document.getElementById("statusMessage").innerHTML = `Error processing selected input file. Error generated
         by application: ${error}
