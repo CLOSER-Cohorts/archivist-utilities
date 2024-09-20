@@ -308,11 +308,11 @@
             dvLinkURL && addLinkToNewDiv(dvLinkURL,
               `${datasetPrefix}_dv.txt`,
               `${datasetPrefix}_dv.txt`,
-              `dv${datasetPrefix.replaceAll("_", "-")}`) 
+              `dv${datasetPrefix.replaceAll("_", "-")}`)
               
           })
 
-        if (!qvLinkURL ||!tvLinkURL || !tqLinkURL || !dvLinkURL)
+        if (!qvLinkURL || !tvLinkURL || !tqLinkURL || !dvLinkURL)
 
             document.getElementById("statusMessage").innerHTML += `Please check that uploaded input has a valid structure:`
 
