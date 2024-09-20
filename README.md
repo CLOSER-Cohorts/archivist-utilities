@@ -1,6 +1,7 @@
 # archivist-utilities
 
-This is a tool that implements the functionality described at https://wiki.ucl.ac.uk/display/CTTEAM/Mappings, where there is also a link to the Excel template to use. 
+This is a tool that implements the functionality described at https://wiki.ucl.ac.uk/display/CTTEAM/Mappings, where there is also a link to an Excel template conforming to the structure required for input files to this
+archivist mappings generator. 
 
 The tool is accessible at https://closer-cohorts.github.io/archivist-utilities/
 
