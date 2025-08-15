@@ -126,6 +126,20 @@
 
       var valueSpecifiedForAtLeastOneRow=[]
 
+      columnsInWorkSheet=[]
+      worksheetDataByRows.forEach(row => Object.keys(row).forEach(key => {
+            if (!columnsInWorkSheet.includes(key))
+               columnsInWorkSheet.push(key)
+            }
+          ))
+      columnsMissingForMappings=columns.filter(
+            item => !columnsInWorkSheet.includes(item))   
+      
+      console.log(columns)
+      console.log(columnsInWorkSheet)      
+      console.log(columnsMissingForMappings)
+
+      //!columnsMissingForMappings.length && 
       worksheetDataByRows.forEach(worksheetRow => {
 
         const rowValues = []
@@ -133,7 +147,9 @@
         columns.forEach(columnName => {
           rowValues.push(worksheetRow[columnName.toLowerCase()]
              + (!!suffix[columnName] ? suffix[columnName] : ""))
-            if (!["n/a", "na", "derived", "undefined", ""].includes(worksheetRow[columnName.toLowerCase()])
+            console.log(columnName) 
+            console.log(worksheetRow[columnName.toLowerCase()])
+            if (!["n/a", "na", "derived", "undefined", ""].includes(String(worksheetRow[columnName.toLowerCase()]))
                 && !valueSpecifiedForAtLeastOneRow.includes(columnName))
                 valueSpecifiedForAtLeastOneRow.push(columnName)
         })
@@ -157,9 +173,28 @@
 
       const downloadLink = window.URL.createObjectURL(formBlob);
 
-      return formBlob.size > 0 ? {"downloadLink": downloadLink} : {
-        "columnsWithNoData": columns.filter(x => !valueSpecifiedForAtLeastOneRow.includes(x))
-      }
+      console.log(valueSpecifiedForAtLeastOneRow)
+
+      const columnsWithNoValues = columns.filter(y => 
+         !columnsMissingForMappings.includes(y)).filter(
+            x => !valueSpecifiedForAtLeastOneRow.includes(x))
+
+      var returnObject = {}
+
+      console.log(!columnsMissingForMappings.length)
+       
+      if (!!columnsMissingForMappings.length)
+      
+             returnObject["columnsMissing"] = columnsMissingForMappings
+
+      if (!!columnsWithNoValues.length)
+
+             returnObject["columnsWithNoData"] = columnsWithNoValues
+
+     console.log(formBlob.size > 0)
+     console.log(returnObject)
+
+      return formBlob.size > 0 ? {"downloadLink": downloadLink} : returnObject
 
     }
 
@@ -268,6 +303,7 @@
               "source dataset prefix", "source variable name"
             ]
 
+            /*
           columnsMissingForQvMappings = columnsRequiredForQvMappings.filter(
             item => !columnNamesQvTvWorksheet.includes(item));
 
@@ -276,10 +312,8 @@
 
           columnsMissingForTqMappings = columnsRequiredForTqMappings.filter(
             item => !columnNamesQvTvWorksheet.includes(item));
-
+*/
           qvTvDatasetPrefixes.forEach(datasetPrefix => {
-
-            if (!columnsMissingForTvMappings.length) {  
 
             tvLinkURL = createBlobURL(qvTvWorksheetOrderedByRows.filter(
               worksheetRow => worksheetRow['dataset prefix'] == datasetPrefix),
@@ -290,10 +324,6 @@
               `${datasetPrefix}_tv.txt`,
               `${datasetPrefix}_tv.txt`,
               `tv${datasetPrefix.replaceAll("_", "-")}`)
-
-            } else {
-              tvLinkURL = {"columnsMissing": columnsMissingForTvMappings}
-            }
 
           })
         
@@ -312,8 +342,7 @@
           })
 
           qvTvQuestionnairePrefixes.forEach(questionnairePrefix => {
-
-          if (!columnsMissingForTqMappings.length) {  
+  
             tqLinkURL = createBlobURL(simplifiedData.filter(
               dataRow => dataRow['questionnaire prefix'] == questionnairePrefix),
               columnsRequiredForTqMappings,
@@ -324,12 +353,8 @@
               `${questionnairePrefix}_tq.txt`,
               `${questionnairePrefix}_tq.txt`,
               `tq${questionnairePrefix.replaceAll("_", "-")}`)
-          }
-          else tqLinkURL = {"columnsMissing": columnsMissingForTqMappings}
           
-          if (!columnsMissingForQvMappings.length) {  
-          
-            qvLinkURL = !columnsMissingForQvMappings.length && createBlobURL(
+            qvLinkURL = createBlobURL(
               qvTvWorksheetOrderedByRows.filter(worksheetRow => 
                   worksheetRow['questionnaire prefix'] == questionnairePrefix),
               columnsRequiredForQvMappings,
@@ -341,11 +366,9 @@
               `${questionnairePrefix}_qv.txt`,
               `qv${questionnairePrefix.replaceAll("_", "-")}`)
 
-              }
-          else qvLinkURL = {"columnsMissing": columnsMissingForQvMappings}
-          
-
           })
+
+          console.log(qvLinkURL)
 
           // Get DV mappings worksheet...
 
@@ -365,9 +388,7 @@
           columnsMissingForDvMappings = columnsRequiredForDvMappings.filter(
             item => !columnNamesDvWorksheet.includes(item));
 
-          if (!columnsMissingForDvMappings.length) {
-
-            dvDatasetPrefixes = (getUniqueArrayValues(dvWorksheetOrderedByRows.map(
+          dvDatasetPrefixes = (getUniqueArrayValues(dvWorksheetOrderedByRows.map(
               worksheetRow => worksheetRow['derived dataset prefix']).filter(datasetPrefixCell =>
               (!!datasetPrefixCell
                 && !(datasetPrefixCell.toLowerCase().includes("n/a")
@@ -389,9 +410,7 @@
                 `dv${datasetPrefix.replaceAll("_", "-")}`)
 
             })
-          }
-          else dvLinkURL = {"columnsMissing": columnsMissingForDvMappings}
-        
+          
         causesForError = ""
 
         /*
@@ -412,8 +431,8 @@
                causesForError += `<li>The following columns were missing from the input 
                   file: ${columnsMissingForQvMappings}</li>`
               
-            document.getElementById("statusMessageDetails").innerHTML += `- Unable to create qv mappings file. 
-               <ol>${causesForError}</ol>`
+            document.getElementById("statusMessageDetails").innerHTML += `- Unable to create qv mappings file for 
+               the following reasons:<ol>${causesForError}</ol>`
         }  
           
         
