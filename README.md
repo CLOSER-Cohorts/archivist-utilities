@@ -22,17 +22,17 @@ The position of these worksheets in the sequence of available worksheets is not 
 The 'QV and TV Mappings' worksheet MUST contain column headings with the following titles:
 
 - Questionnaire prefix
-- Question name
+- Question name (from questions)
 - Dataset prefix
 - Variable name
 - Topic id
 
 The 'DV' worksheet MUST contain column headings with the following titles:
 
-- Derived Dataset prefix
-- Derived Variable Name
-- Source Dataset prefix
-- Source Variable Name
+- Derived dataset prefix
+- Derived variable name
+- Source dataset prefix
+- Source variable name
 
 When generating mapping files from the input spreadsheet, if a worksheet row contains insufficient information, i.e. it doesn't contain values in all required cells, that row will not be used in the creation of a mapping file. The columns required for each type of mapping file are listed below.
 
@@ -43,11 +43,11 @@ Any rows with cells containing 'NA' or 'Derived' (not case-sensitive), or cells 
 The following column headers must be present in the 'QV and TV Mappings' worksheet in the input Excel file, in order to create the qv text files:
 
  - Questionnaire prefix
- - Question name
+ - Question name (from questions)
  - Dataset prefix
  - Variable name
 
-The headers are not case sensitive, i.e. a column called 'question name' instead of 'Question Name' is acceptable.
+The headers are not case sensitive, i.e. a column called 'question name (from questions)' instead of 'Question name (from questions)' is acceptable.
 
 A separate qv text file will be created for each unique questionnaire prefix value in the 'QV and TV Mappings' worksheet in the input Excel file. The questionnaire prefix will automatically have _ccs01 suffixed. 
 
@@ -64,7 +64,7 @@ The following column headers must be present in the 'QV and TV Mappings' workshe
  - Variable name
  - Topic id
 
-The headers are not case sensitive, i.e. a column called 'dataset prefix' instead of 'Dataset Prefix' is acceptable.
+The headers are not case sensitive, i.e. a column called 'dataset prefix' instead of 'Dataset prefix' is acceptable.
 
 A separate tv text file will be created for each unique dataset prefix value in the 'QV and TV Mappings' worksheet in the input Excel file.
 
@@ -78,10 +78,10 @@ For example, if some rows in the input worksheet had the value 'heaf_17_fup4' fo
 The following column headers must be present in the 'QV and TV Mappings' worksheet in the input Excel file, in order to create the tq text files:
 
  - Questionnaire prefix
- - Question name
+ - Question name (from questions)
  - Topic id
 
-The headers are not case sensitive, i.e. a column called 'question name' instead of 'Question Name' is acceptable. For rows which have the same topic ID but different grid cells (e.g. qc_1$1;1), all but one will be removed and this will have the suffix removed (e.g. resulting in qc_1) to allow for loading into Archivist which only allows one topic per question. 
+The headers are not case sensitive, i.e. a column called 'question name (from questions)' instead of 'Question Name (from questions)' is acceptable. For rows which have the same topic ID but different grid cells (e.g. qc_1$1;1), all but one will be removed and this will have the suffix removed (e.g. resulting in qc_1) to allow for loading into Archivist which only allows one topic per question. 
 
 A separate tq text file will be created for each unique questionnaire prefix value in the input Excel file.
 For example, if some rows in the input worksheet had the value 'heaf_17_fup4' for the 'Questionnaire prefix' column, and some other rows had the value 'heaf_17_fup5' for that column, this would result in 2 text files being generated: 
@@ -93,19 +93,19 @@ For example, if some rows in the input worksheet had the value 'heaf_17_fup4' fo
 
 The following column headers must be present in the 'DV' worksheet in the input Excel file, in order to create the dv text files:
 
- - Derived Dataset prefix
- - Derived Variable Name
- - Source Dataset prefix
- - Source Variable Name
+ - Derived dataset prefix
+ - Derived variable name
+ - Source dataset prefix
+ - Source variable name
 
-The headers are not case sensitive, i.e. a column called 'derived dataset prefix' instead of 'Derived Dataset prefix' is acceptable.
+The headers are not case sensitive, i.e. a column called 'derived dataset prefix' instead of 'Derived dataset prefix' is acceptable.
 
 A separate dv text file will be created for each unique derived dataset prefix value in the 'DV' worksheet in the input Excel file.
 
-For example, if some rows in the 'DV' worksheet had the value 'heaf_17_fup4' for the 'Derived Dataset prefix' column, and some other rows had the value 'heaf_17_fup5' for that column, this would result in 2 text files being generated: 
+For example, if some rows in the 'DV' worksheet had the value 'heaf_17_fup4' for the 'Derived dataset prefix' column, and some other rows had the value 'heaf_17_fup5' for that column, this would result in 2 text files being generated: 
  
- - heaf_17_fup4_dv.txt (containing all the rows which had the value 'heaf_17_fup4' in the 'Derived Dataset prefix' column)
- - heaf_17_fup5_dv.txt (containing all the rows which had the value 'heaf_17_fup5' in the 'Derived Dataset prefix' column)
+ - heaf_17_fup4_dv.txt (containing all the rows which had the value 'heaf_17_fup4' in the 'Derived dataset prefix' column)
+ - heaf_17_fup5_dv.txt (containing all the rows which had the value 'heaf_17_fup5' in the 'Derived dataset prefix' column)
           
 ## Text mapping file generation
 

@@ -199,17 +199,10 @@
                worksheetColumnNames.push(key)
             }
           ))
-
-      //console.log(worksheetColumnNames)
-      //console.log(columnsToInspect)    
       columnsMissing = columnsToInspect.filter(
             column => !worksheetColumnNames.includes(column));
       columnsPresent = columnsToInspect.filter(
             column => worksheetColumnNames.includes(column));
-          /*
-IS THERE ANY WAY THE BELOW CAN BE USED TO GENERATE THE DATA THAT IS
-PASSED INTO THE FUNCTION THAT CREATES THE BLOB
-*/
       columnsWithNoData=[]
       columnsPresent.forEach(column => {
           validCellValues=worksheetData.map(row =>  {
@@ -219,17 +212,16 @@ PASSED INTO THE FUNCTION THAT CREATES THE BLOB
             if (validCellValues.length==0)
                  columnsWithNoData.push(column)   
           })
-      console.log(validCellValues)
-
+      
       var returnObject = {}
 
       if (!!columnsMissing.length)
 
-            returnObject["columnsMissing"] = columnsMissing
+            returnObject['columnsMissing'] = columnsMissing
 
       if (!!columnsWithNoData.length) 
 
-            returnObject["columnsWithNoData"] = columnsWithNoData
+            returnObject['columnsWithNoData'] = columnsWithNoData
           
       return returnObject
     }
@@ -237,17 +229,11 @@ PASSED INTO THE FUNCTION THAT CREATES THE BLOB
     function flagEmptyMappings(issuesWithData, errorField, prefix) {
 
         prefixesWithNoData = !!issuesWithData[errorField] 
-                    ? issuesWithData[errorField] : "" 
+                    ? issuesWithData[errorField] : [] 
 
-        console.log(prefixesWithNoData)   
-        
-        console.log(issuesWithData[errorField])
+        prefixesWithNoData.push(prefix)
 
-        console.log(errorField)
-
-        issuesWithData[errorField] = prefixesWithNoData + prefix
-
-        console.log(issuesWithData)
+        issuesWithData[errorField] = prefixesWithNoData
 
         return issuesWithData
     }
@@ -260,13 +246,25 @@ PASSED INTO THE FUNCTION THAT CREATES THE BLOB
                  '${worksheetName}' worksheet and contain data: <ul>${issuesWithData['columnsWithNoData'].map(
                  column =>  "<li>"+ column +"</li>").join("")}</ul></li>`      
       if (!!issuesWithData?.['columnsMissing'])
-               causesForError += `<li>The following columns were missing from the ${worksheetName}  
+               causesForError += `<li>The following required columns were missing from the '${worksheetName}'  
                   worksheet: <ul>${issuesWithData['columnsMissing'].map(
-                 column =>  "<li>"+ column +"</li>")}</ul></li>`
+                 column =>  "<li>"+ column +"</li>").join("")}</ul></li>`
+      if (!!issuesWithData?.['noDataForQuestionnairePrefix'])
+               causesForError += `<li>The following questionnaire 
+                   prefix(es) were present in the '${worksheetName}' worksheet, but there were no 
+                   rows containing sufficient data to generate a valid ${mappingsFileType} mappings 
+                   file for these prefix(es).<ul>${issuesWithData['noDataForQuestionnairePrefix'].map(
+                      column =>  "<li>"+ column +"</li>").join("")}</ul></li>`
+      if (!!issuesWithData?.['noDataForDatasetPrefix'])
+               causesForError += `<li>The following dataset 
+                   prefix(es) were present in the '${worksheetName}' worksheet, but there were no 
+                   rows containing sufficient data to generate a valid ${mappingsFileType} mappings 
+                   file for these prefix(es).<ul>${issuesWithData['noDataForDatasetPrefix'].map(
+                      column =>  "<li>"+ column +"</li>").join("")}</ul></li>`
               
-      document.getElementById("statusMessageDetails").innerHTML += `- Unable to create any ${mappingsFileType} 
-          mappings files for the following reasons:<ol>${causesForError}</ol>`
-
+      document.getElementById("statusMessageDetails").innerHTML += `- The following issues were detected
+          when trying to create ${mappingsFileType} mappings files:<ol>${causesForError}</ol>`
+        
     }
 
     function handleFiles(fileList) {
@@ -310,23 +308,12 @@ PASSED INTO THE FUNCTION THAT CREATES THE BLOB
       
           var issuesWithQvData = findIssuesWithData(columnsRequiredForQvMappings,
                 qvTvWorksheetOrderedByRows)
-          console.log(issuesWithQvData)
-          /*
-          DO SOMETHING LIKE
-
-          if (issuesWithQvData=={})
-
-             generateLinkToQvFile()
-*/
+          
           var issuesWithTvData = findIssuesWithData(columnsRequiredForTvMappings,
                 qvTvWorksheetOrderedByRows)
 
-          console.log(issuesWithTvData)
-          
           var issuesWithTqData = findIssuesWithData(columnsRequiredForTqMappings,
                 qvTvWorksheetOrderedByRows)
-          console.log(issuesWithTqData)
-
           var qvTvDatasetPrefixes = (getUniqueArrayValues(qvTvWorksheetOrderedByRows.map(
             worksheetRow => worksheetRow['dataset prefix']).filter(datasetPrefixCell =>
                (!!datasetPrefixCell && !(datasetPrefixCell.toLowerCase().includes("n/a") 
@@ -340,8 +327,6 @@ PASSED INTO THE FUNCTION THAT CREATES THE BLOB
                || questionnairePrefixCell.toLowerCase().includes("na") 
                || questionnairePrefixCell.toLowerCase().includes("derived") || !questionnairePrefixCell.trim()))
            )))
-
-
 
           qvTvDatasetPrefixes.forEach(datasetPrefix => {
 
@@ -375,8 +360,6 @@ PASSED INTO THE FUNCTION THAT CREATES THE BLOB
               simplifiedData.push(worksheetRow)
           })
 
-          console.log(qvTvQuestionnairePrefixes)
-
           qvTvQuestionnairePrefixes.forEach(questionnairePrefix => {
   
             tqLinkURL = createBlobURL(simplifiedData.filter(
@@ -389,8 +372,6 @@ PASSED INTO THE FUNCTION THAT CREATES THE BLOB
               `${questionnairePrefix}_tq.txt`,
               `${questionnairePrefix}_tq.txt`,
               `tq${questionnairePrefix.replaceAll("_", "-")}`)
-
-            console.log(tqLinkURL)  
 
             if (!Object.keys(tqLinkURL).length)
 
@@ -408,16 +389,11 @@ PASSED INTO THE FUNCTION THAT CREATES THE BLOB
               `${questionnairePrefix}_qv.txt`,
               `qv${questionnairePrefix.replaceAll("_", "-")}`)
 
-            console.log(qvLinkURL)  
-            console.log(!Object.keys(qvLinkURL).length) 
-
             if (!Object.keys(qvLinkURL).length)
 
                 issuesWithQvData = flagEmptyMappings(issuesWithQvData, 'noDataForQuestionnairePrefix', questionnairePrefix)
 
           })
-
-          console.log(qvLinkURL)
 
           // Get DV mappings worksheet...
 
@@ -437,10 +413,6 @@ PASSED INTO THE FUNCTION THAT CREATES THE BLOB
           var issuesWithDvData = findIssuesWithData(columnsRequiredForDvMappings,
                 dvWorksheetOrderedByRows)
 
-/*
-          columnsMissingForDvMappings = columnsRequiredForDvMappings.filter(
-            item => !columnNamesDvWorksheet.includes(item));
-*/
           var dvLinkURL;
   
           dvDatasetPrefixes = (getUniqueArrayValues(dvWorksheetOrderedByRows.map(
@@ -468,119 +440,22 @@ PASSED INTO THE FUNCTION THAT CREATES THE BLOB
 
             })
           
-        
-        /*
-        if (!qvLinkURL?.['downloadLink'] 
-            || !tvLinkURL?.['downloadLink'] 
-            || !tqLinkURL?.['downloadLink'] 
-            || !dvLinkURL?.['downloadLink'])
-
-            document.getElementById("statusMessage").innerHTML += `Please check that uploaded input has a valid structure`
-*/
-        console.log(qvLinkURL)
-        console.log(issuesWithQvData)
-        console.log(issuesWithTqData)
-        console.log(issuesWithTvData)
-        console.log(issuesWithDvData)
-
-        if (!qvLinkURL?.['downloadLink']) {
+        if (!!Object.keys(issuesWithQvData).length)
 
             showErrors(issuesWithQvData, 'QV and TV mappings', 'qv')
-/*
-            causesForErrorQvFile = ""
         
-            if (!!issuesWithQvData?.['columnsWithNoData']) causesForErrorQvFile += `<li>There were no values for
-               the following columns in the input worksheet, check that the column(s) exist in the
-                 'QV and TV mappings' worksheet and contain data: <ul>${issuesWithQvData['columnsWithNoData'].map(
-                 column =>  "<li>"+ column +"</li>").join("")}</ul></li>`      
-            if (!!issuesWithQvData?.['columnsMissing'])
-               causesForErrorQvFile += `<li>The following columns were missing from the input 
-                  file: <ul>${issuesWithQvData['columnsMissing'].map(
-                 column =>  "<li>"+ column +"</li>")}</ul></li>`
-              
-            document.getElementById("statusMessageDetails").innerHTML += `- Unable to create any qv mappings files 
-               for the following reasons:<ol>${causesForErrorQvFile}</ol>`*/
-        }
+        if (!!Object.keys(issuesWithTvData).length)    
         
-        else if (!!issuesWithQvData?.['noDataForQuestionnairePrefix']) {
-              document.getElementById("statusMessageDetails").innerHTML += `- The questionnaire 
-                   prefix ${issuesWithQvData?.['noDataForQuestionnairePrefix']} is present in 
-                   the 'QV and TV mappings' worksheet, but there were no rows with this prefix
-                   containing sufficient data to generate a valid qv mappings file for this prefix.<p>`
-        }
+            showErrors(issuesWithTvData, 'QV and TV mappings', 'tv')
+
+        if (!!Object.keys(issuesWithTqData).length)
+      
+            showErrors(issuesWithTqData, 'QV and TV mappings', 'tq')
+
+        if (!!Object.keys(issuesWithDvData).length)    
         
-        if (!tvLinkURL?.['downloadLink']) {
-
-            causesForErrorTvFile = ""
-
-            if (!!issuesWithTvData?.['columnsWithNoData']) causesForErrorTvFile += `<li>There were no values for
-               the following columns in the input worksheet, check that the column(s) exist in the
-                 'QV and TV mappings' worksheet and contain data: <ul>${issuesWithTvData['columnsWithNoData'].map(
-                 column =>  "<li>"+ column +"</li>").join("")}</ul></li>`      
-            if (!!issuesWithTvData?.['columnsMissing'])
-               causesForErrorTvFile += `<li>The following columns were missing from the input 
-                  file: <ul>${issuesWithTvData['columnsMissing'].map(
-                 column =>  "<li>"+ column +"</li>")}</ul></li>`
-            
-            document.getElementById("statusMessageDetails").innerHTML += `- Unable to create any tv mappings
-                files for the following reasons: <ol>${causesForErrorTvFile}</ol>`
-        }
-
-        else if (!!issuesWithTvData?.['noDataForDatasetPrefix']) {
-              document.getElementById("statusMessageDetails").innerHTML += `- The dataset 
-                   prefix ${issuesWithTvData?.['noDataForDatasetPrefix']} is present in the 
-                   'QV and TV mappings' worksheet, but there were no rows with this prefix 
-                   containing sufficient data to generate a valid tv mappings file for this prefix.<p>`
-        }
-
-        if (!tqLinkURL?.['downloadLink'])  {
-          
-            causesForErrorTqFile=""
-           
-            if (!!issuesWithTqData?.['columnsWithNoData']) causesForErrorTqFile += `<li>There were no values for
-               the following columns in the input worksheet, check that the column(s) exist in the
-                 'QV and TV mappings' worksheet and contain data: <ul>${issuesWithTqData['columnsWithNoData'].map(
-                 column =>  "<li>"+ column +"</li>")}</ul></li>` 
-            if (!!issuesWithTqData?.['columnsMissing'])
-               causesForErrorTqFile += `<li>The following columns were missing from the input 
-                 file: <ul>${issuesWithTqData['columnsMissing'].map(
-                 column =>  "<li>"+ column +"</li>")}</ul></li>`
+            showErrors(issuesWithDvData, 'DV', 'dv')
                 
-            document.getElementById("statusMessageDetails").innerHTML += `- Unable to create any tq mappings 
-               files for the following reasons: <ol>${causesForErrorTqFile}</ol>`
-        }
-
-        else if (!!issuesWithTqData?.['noDataForQuestionnairePrefix']) {
-              document.getElementById("statusMessageDetails").innerHTML += `- The questionnaire 
-                   prefix ${issuesWithQvData?.['noDataForQuestionnairePrefix']} is present in 
-                   the 'QV and TV mappings' worksheet, but there were no rows with this prefix 
-                   containing sufficient data to generate a valid tq mappings file for this prefix.<p>`
-        }
-
-        if (!issuesWithDvData?.['downloadLink'])  {
-            
-            causesForErrorDvFile = ""
-
-            if (!!issuesWithDvData?.['columnsWithNoData']) causesForErrorDvFile += `<li>There were no values for
-               the following columns in the input worksheet, check that the column(s) exist in the
-                 'DV' worksheet and contain data: <ul>${issuesWithDvData['columnsWithNoData'].map(
-                 column =>  "<li>"+ column +"</li>").join("")}</ul></li>`   
-            if (!!issuesWithDvData?.['columnsMissing'])
-               causesForErrorDvFile += `<li>The following columns were missing from the input 
-                 file: <ul>${issuesWithDvData['columnsMissing'].map(
-                 column =>  "<li>"+ column +"</li>")}</ul></li>`
-            
-            document.getElementById("statusMessageDetails").innerHTML += `- Unable to create any dv mappings 
-            files for the following reasons: <ol>${causesForErrorDvFile}</ol>` 
-        }
-
-        else if (!!issuesWithDvData?.['noDataForDatasetPrefix']) {
-              document.getElementById("statusMessageDetails").innerHTML += `- The dataset 
-                   prefix ${issuesWithDvData?.['noDataForDatasetPrefix']} is present in 
-                   the 'DV' worksheet, but there were no rows with this prefix 
-                   containing sufficient data to generate a valid dv mappings file for this prefix.<p>`
-        }
-            
         } catch (error) {
           document.getElementById("statusMessage").innerHTML = `Error processing selected input file. Error generated
         by application: ${error}
