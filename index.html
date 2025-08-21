@@ -226,7 +226,7 @@
       return returnObject
     }
 
-    function flagEmptyMappings(issuesWithData, errorField, prefix) {
+    function flagEmptyMappingsFile(issuesWithData, errorField, prefix) {
 
         prefixesWithNoData = !!issuesWithData[errorField] 
                     ? issuesWithData[errorField] : [] 
@@ -261,7 +261,12 @@
                    rows containing sufficient data to generate a valid ${mappingsFileType} mappings 
                    file for these prefix(es).<ul>${issuesWithData['noDataForDatasetPrefix'].map(
                       column =>  "<li>"+ column +"</li>").join("")}</ul></li>`
-              
+      if (!!issuesWithData?.['missingQvTvWorksheet'])
+               causesForError += issuesWithData['missingQvTvWorksheet']
+      
+      if (!!issuesWithData?.['missingDvWorksheet'])
+               causesForError += issuesWithData['missingDvWorksheet']
+               
       document.getElementById("statusMessageDetails").innerHTML += `- The following issues were detected
           when trying to create ${mappingsFileType} mappings files:<ol>${causesForError}</ol>`
         
@@ -285,144 +290,159 @@
 
           const qvTvWorksheet = workBook[Object.keys(workBook).find(key => key.toLowerCase() === 'qv and tv mappings')]
 
-          var qvLinkURL;
-          var tvLinkURL;
-          var tqLinkURL;
-
-          columnsRequiredForQvMappings = ['questionnaire prefix', 'question name (from questions)', 
-             'dataset prefix', 'variable name']
-
-          columnsRequiredForTvMappings = ['dataset prefix', 'variable name', 'topic id']
-
-          columnsRequiredForTqMappings = ['questionnaire prefix', 'question name (from questions)', 
-             'topic id']
-
-          columnsRequiredForDvMappings = ["derived dataset prefix", "derived variable name",
-              "source dataset prefix", "source variable name"
-            ]
-
-          const qvTvWorksheetOrderedByRows = columnNamesToLowerCase(
-            XLSX.utils.sheet_to_json(qvTvWorksheet, { defval: "" }))
-
-          
-      
-          var issuesWithQvData = findIssuesWithData(columnsRequiredForQvMappings,
-                qvTvWorksheetOrderedByRows)
-          
-          var issuesWithTvData = findIssuesWithData(columnsRequiredForTvMappings,
-                qvTvWorksheetOrderedByRows)
-
-          var issuesWithTqData = findIssuesWithData(columnsRequiredForTqMappings,
-                qvTvWorksheetOrderedByRows)
-          var qvTvDatasetPrefixes = (getUniqueArrayValues(qvTvWorksheetOrderedByRows.map(
-            worksheetRow => worksheetRow['dataset prefix']).filter(datasetPrefixCell =>
-               (!!datasetPrefixCell && !(datasetPrefixCell.toLowerCase().includes("n/a") 
-               || datasetPrefixCell.toLowerCase().includes("na") 
-               || datasetPrefixCell.toLowerCase().includes("derived") || !datasetPrefixCell.trim()))
-           )))
-          
-          var qvTvQuestionnairePrefixes = (getUniqueArrayValues(qvTvWorksheetOrderedByRows.map(
-             worksheetRow => worksheetRow['questionnaire prefix']).filter(questionnairePrefixCell =>
-               (!!questionnairePrefixCell && !(questionnairePrefixCell.toLowerCase().includes("n/a") 
-               || questionnairePrefixCell.toLowerCase().includes("na") 
-               || questionnairePrefixCell.toLowerCase().includes("derived") || !questionnairePrefixCell.trim()))
-           )))
-
-          qvTvDatasetPrefixes.forEach(datasetPrefix => {
-
-            tvLinkURL = createBlobURL(qvTvWorksheetOrderedByRows.filter(
-              worksheetRow => worksheetRow['dataset prefix'] == datasetPrefix),
-              columnsRequiredForTvMappings,
-              `${datasetPrefix}_tv.txt`)
-
-            !!tvLinkURL['downloadLink'] && addLinkToNewDiv(tvLinkURL,
-              `${datasetPrefix}_tv.txt`,
-              `${datasetPrefix}_tv.txt`,
-              `tv${datasetPrefix.replaceAll("_", "-")}`)
-
-            if (!Object.keys(tvLinkURL).length)
-
-                issuesWithTvData = flagEmptyMappings(issuesWithTvData, 'noDataForDatasetPrefix', datasetPrefix)
-
-          })
-        
-          simplifiedData = []
-
-          qvTvWorksheetOrderedByRows.forEach(worksheetRow => {
-            if (worksheetRow['question name (from questions)']?.includes("$")) {
-              indexOfDollarSign = worksheetRow['question name (from questions)'].indexOf("$")
-              worksheetRow['question name (from questions)'] = (worksheetRow['question name (from questions)'].slice(0, indexOfDollarSign))
-
+          if (!qvTvWorksheet) {
+            issuesWithQvData = issuesWithTvData = issuesWithTqData = {
+              "missingQvTvWorksheet":
+                "The 'QV and TV Mappings' worksheet could not be found in the uploaded spreadsheet."
             }
-            if (simplifiedData.filter(dataRow => 
-               dataRow['question name (from questions)'] == worksheetRow['question name (from questions)']
-                 && dataRow['topic id'] == worksheetRow['topic id']).length == 0)
-              simplifiedData.push(worksheetRow)
-          })
+          }
+          else {
+            var qvLinkURL;
+            var tvLinkURL;
+            var tqLinkURL;
 
-          qvTvQuestionnairePrefixes.forEach(questionnairePrefix => {
-  
-            tqLinkURL = createBlobURL(simplifiedData.filter(
-              dataRow => dataRow['questionnaire prefix'] == questionnairePrefix),
-              columnsRequiredForTqMappings,
-              `${questionnairePrefix}_tq.txt`,
-              { 'questionnaire prefix': '_ccs01' })
+            columnsRequiredForQvMappings = ['questionnaire prefix', 'question name (from questions)',
+              'dataset prefix', 'variable name']
 
-            !!tqLinkURL['downloadLink'] && addLinkToNewDiv(tqLinkURL,
-              `${questionnairePrefix}_tq.txt`,
-              `${questionnairePrefix}_tq.txt`,
-              `tq${questionnairePrefix.replaceAll("_", "-")}`)
+            columnsRequiredForTvMappings = ['dataset prefix', 'variable name', 'topic id']
 
-            if (!Object.keys(tqLinkURL).length)
+            columnsRequiredForTqMappings = ['questionnaire prefix', 'question name (from questions)',
+              'topic id']
 
-                issuesWithTqData = flagEmptyMappings(issuesWithTqData, 'noDataForQuestionnairePrefix', questionnairePrefix)
+            const qvTvWorksheetOrderedByRows = columnNamesToLowerCase(
+              XLSX.utils.sheet_to_json(qvTvWorksheet, { defval: "" }))
 
-            qvLinkURL = createBlobURL(
-              qvTvWorksheetOrderedByRows.filter(worksheetRow => 
+            var issuesWithQvData = findIssuesWithData(columnsRequiredForQvMappings,
+              qvTvWorksheetOrderedByRows)
+
+            var issuesWithTvData = findIssuesWithData(columnsRequiredForTvMappings,
+              qvTvWorksheetOrderedByRows)
+
+            var issuesWithTqData = findIssuesWithData(columnsRequiredForTqMappings,
+              qvTvWorksheetOrderedByRows)
+
+            var qvTvDatasetPrefixes = (getUniqueArrayValues(qvTvWorksheetOrderedByRows.map(
+              worksheetRow => worksheetRow['dataset prefix']).filter(datasetPrefixCell =>
+              (!!datasetPrefixCell && !(datasetPrefixCell.toLowerCase().includes("n/a")
+                || datasetPrefixCell.toLowerCase().includes("na")
+                || datasetPrefixCell.toLowerCase().includes("derived") || !datasetPrefixCell.trim()))
+              )))
+
+            var qvTvQuestionnairePrefixes = (getUniqueArrayValues(qvTvWorksheetOrderedByRows.map(
+              worksheetRow => worksheetRow['questionnaire prefix']).filter(questionnairePrefixCell =>
+              (!!questionnairePrefixCell && !(questionnairePrefixCell.toLowerCase().includes("n/a")
+                || questionnairePrefixCell.toLowerCase().includes("na")
+                || questionnairePrefixCell.toLowerCase().includes("derived") || !questionnairePrefixCell.trim()))
+              )))
+
+            qvTvDatasetPrefixes.forEach(datasetPrefix => {
+
+              tvLinkURL = createBlobURL(qvTvWorksheetOrderedByRows.filter(
+                worksheetRow => worksheetRow['dataset prefix'] == datasetPrefix),
+                columnsRequiredForTvMappings,
+                `${datasetPrefix}_tv.txt`)
+
+              !!tvLinkURL['downloadLink'] && addLinkToNewDiv(tvLinkURL,
+                `${datasetPrefix}_tv.txt`,
+                `${datasetPrefix}_tv.txt`,
+                `tv${datasetPrefix.replaceAll("_", "-")}`)
+
+              if (!Object.keys(tvLinkURL).length)
+
+                issuesWithTvData = flagEmptyMappingsFile(issuesWithTvData, 'noDataForDatasetPrefix', datasetPrefix)
+
+            })
+
+            simplifiedData = []
+
+            qvTvWorksheetOrderedByRows.forEach(worksheetRow => {
+              if (worksheetRow['question name (from questions)']?.includes("$")) {
+                indexOfDollarSign = worksheetRow['question name (from questions)'].indexOf("$")
+                worksheetRow['question name (from questions)'] = (worksheetRow['question name (from questions)'].slice(0, indexOfDollarSign))
+
+              }
+              if (simplifiedData.filter(dataRow =>
+                dataRow['question name (from questions)'] == worksheetRow['question name (from questions)']
+                && dataRow['topic id'] == worksheetRow['topic id']).length == 0)
+                simplifiedData.push(worksheetRow)
+            })
+
+            qvTvQuestionnairePrefixes.forEach(questionnairePrefix => {
+
+              tqLinkURL = createBlobURL(simplifiedData.filter(
+                dataRow => dataRow['questionnaire prefix'] == questionnairePrefix),
+                columnsRequiredForTqMappings,
+                `${questionnairePrefix}_tq.txt`,
+                { 'questionnaire prefix': '_ccs01' })
+
+              !!tqLinkURL['downloadLink'] && addLinkToNewDiv(tqLinkURL,
+                `${questionnairePrefix}_tq.txt`,
+                `${questionnairePrefix}_tq.txt`,
+                `tq${questionnairePrefix.replaceAll("_", "-")}`)
+
+              if (!Object.keys(tqLinkURL).length)
+
+                issuesWithTqData = flagEmptyMappingsFile(issuesWithTqData, 'noDataForQuestionnairePrefix', questionnairePrefix)
+
+              qvLinkURL = createBlobURL(
+                qvTvWorksheetOrderedByRows.filter(worksheetRow =>
                   worksheetRow['questionnaire prefix'] == questionnairePrefix),
-              columnsRequiredForQvMappings,
-              `${questionnairePrefix}_qv.txt`,
-              { 'questionnaire prefix': '_ccs01' })
+                columnsRequiredForQvMappings,
+                `${questionnairePrefix}_qv.txt`,
+                { 'questionnaire prefix': '_ccs01' })
 
-            !!qvLinkURL['downloadLink'] && addLinkToNewDiv(qvLinkURL,
-              `${questionnairePrefix}_qv.txt`,
-              `${questionnairePrefix}_qv.txt`,
-              `qv${questionnairePrefix.replaceAll("_", "-")}`)
+              !!qvLinkURL['downloadLink'] && addLinkToNewDiv(qvLinkURL,
+                `${questionnairePrefix}_qv.txt`,
+                `${questionnairePrefix}_qv.txt`,
+                `qv${questionnairePrefix.replaceAll("_", "-")}`)
 
-            if (!Object.keys(qvLinkURL).length)
+              if (!Object.keys(qvLinkURL).length)
 
-                issuesWithQvData = flagEmptyMappings(issuesWithQvData, 'noDataForQuestionnairePrefix', questionnairePrefix)
+                issuesWithQvData = flagEmptyMappingsFile(issuesWithQvData, 'noDataForQuestionnairePrefix', questionnairePrefix)
 
-          })
+            })
+          }
 
           // Get DV mappings worksheet...
 
           const dvWorksheet = workBook[Object.keys(workBook).find(key => key.toLowerCase() === 'dv')]
 
-          const dvWorksheetOrderedByRows = columnNamesToLowerCase(
-            XLSX.utils.sheet_to_json(dvWorksheet, { defval: "" }))
-
-          columnNamesDvWorksheet=[]
-
-          dvWorksheetOrderedByRows.forEach(row => Object.keys(row).forEach(key => {
-            if (!columnNamesDvWorksheet.includes(key))
-               columnNamesDvWorksheet.push(key)
+          if (!dvWorksheet) {
+            issuesWithDvData = {
+              "missingDvWorksheet":
+                "The 'DV' worksheet could not be found in the uploaded spreadsheet."
             }
-          ))
+          }
+          else {
 
-          var issuesWithDvData = findIssuesWithData(columnsRequiredForDvMappings,
-                dvWorksheetOrderedByRows)
+            const dvWorksheetOrderedByRows = columnNamesToLowerCase(
+              XLSX.utils.sheet_to_json(dvWorksheet, { defval: "" }))
 
-          var dvLinkURL;
-  
-          dvDatasetPrefixes = (getUniqueArrayValues(dvWorksheetOrderedByRows.map(
+            columnNamesDvWorksheet = []
+
+            dvWorksheetOrderedByRows.forEach(row => Object.keys(row).forEach(key => {
+              if (!columnNamesDvWorksheet.includes(key))
+                columnNamesDvWorksheet.push(key)
+            }
+            ))
+
+            var dvLinkURL;
+
+            columnsRequiredForDvMappings = ["derived dataset prefix", "derived variable name",
+              "source dataset prefix", "source variable name"
+            ]
+
+            var issuesWithDvData = findIssuesWithData(columnsRequiredForDvMappings,
+              dvWorksheetOrderedByRows)
+
+            dvDatasetPrefixes = (getUniqueArrayValues(dvWorksheetOrderedByRows.map(
               worksheetRow => worksheetRow['derived dataset prefix']).filter(datasetPrefixCell =>
               (!!datasetPrefixCell
                 && !(datasetPrefixCell.toLowerCase().includes("n/a")
                   || datasetPrefixCell.toLowerCase().includes("na")
                   || datasetPrefixCell.toLowerCase().includes("derived") || !datasetPrefixCell.trim()))
               )))
-          
+
             dvDatasetPrefixes.forEach(datasetPrefix => {
               dvLinkURL = createBlobURL(dvWorksheetOrderedByRows.filter(
                 worksheetRow => worksheetRow['derived dataset prefix'] == datasetPrefix),
@@ -436,25 +456,26 @@
 
               if (!Object.keys(dvLinkURL).length)
 
-                issuesWithDvData = flagEmptyMappings(issuesWithDvData, 'noDataForDatasetPrefix', datasetPrefix)
+                issuesWithDvData = flagEmptyMappingsFile(issuesWithDvData, 'noDataForDatasetPrefix', datasetPrefix)
 
             })
+          }
           
-        if (!!Object.keys(issuesWithQvData).length)
+          if (!!Object.keys(issuesWithQvData).length)
 
-            showErrors(issuesWithQvData, 'QV and TV mappings', 'qv')
+              showErrors(issuesWithQvData, 'QV and TV mappings', 'qv')
         
-        if (!!Object.keys(issuesWithTvData).length)    
+          if (!!Object.keys(issuesWithTvData).length)    
         
-            showErrors(issuesWithTvData, 'QV and TV mappings', 'tv')
+              showErrors(issuesWithTvData, 'QV and TV mappings', 'tv')
 
-        if (!!Object.keys(issuesWithTqData).length)
+          if (!!Object.keys(issuesWithTqData).length)
       
-            showErrors(issuesWithTqData, 'QV and TV mappings', 'tq')
+              showErrors(issuesWithTqData, 'QV and TV mappings', 'tq')
 
-        if (!!Object.keys(issuesWithDvData).length)    
+          if (!!Object.keys(issuesWithDvData).length)    
         
-            showErrors(issuesWithDvData, 'DV', 'dv')
+              showErrors(issuesWithDvData, 'DV', 'dv')
                 
         } catch (error) {
           document.getElementById("statusMessage").innerHTML = `Error processing selected input file. Error generated
@@ -481,7 +502,7 @@
         else {
 
           document.getElementById("downloadAllFiles")
-            .innerHTML = "Insufficient data in input spreadsheet to generate mapping files."
+            .innerHTML = "Insufficient data in input spreadsheet to generate any mapping files."
           
         }
 
